@@ -1,0 +1,842 @@
+DAY-01 24/05/2024:
+------------------
+
+
+APPLICATION :
+-------------
+--> Application is a collection of services.
+
+
+MONOLITHIC:
+-----------
+--> Multiple services are deployed on single server with single data base.
+
+
+MICRO SERVICES:
+---------------
+--> Multiple services are deployed on multiple servers with multiple data bases.
+
+--> Based on users and app complexity we need to select the architecture.
+
+
+FACTORS AFFECTING FOR USING MICRO SERVICES:
+-------------------------------------------
+1. Cost
+2. Maintainance
+
+--> In order to overcome this we are using containers.
+
+
+CONTAINERS:
+-----------
+--> It's same as a server/vm.
+--> It will not have any operating system.
+--> OS will be on images. (SERVER = AMI, CONTAINER = IMAGE).
+--> It's free of cost we can create multiple containers.
+
+
+DOCKER:
+-------
+--> It's an free and open source tool.
+--> It is platform independent.
+--> Used to create, run and deploy applications on containers.
+--> It is introduced on 2013 by solomenhykes and sebastian phal.
+--> We used GO language to develop the docker.
+--> Here, we write files on YAML.
+--> Before docker user faced a lot of problems, but after docker there is no issues with the application.
+--> Docker will use host resources (cpu, mem, n/w, and os).
+--> Docker will run on any OS but it natively supports Linux distributions.
+
+
+CONTAINERIZATION (or) DOCKERIZATION:
+------------------------------------
+--> The process of packing an application with its dependencies.
+Ex : PUBG
+
+APP = PUBG & DEPENDENCY = MAPS
+APP = CAKE & DEPENDENCY = KNIFE
+
+
+ARCHITECTURE AND COMPONENTS:
+----------------------------
+CLIENT		: Client interact with user, user gives commands and it will be executed by docker client.
+
+DAEMON		: Manage the docker components (images, containers, volumes).
+
+HOST		: Where we install the docker (ex: linux, windows, macos).
+
+REGISTRY	: Manages the docker images.
+
+
+ARCHITECTURE OF DOCKER:
+-----------------------
+yum install docker -y      #client
+
+systemctl start docker      #client, engine (or) daemon
+systemctl status docker   
+
+
+COMMANDS:
+---------
+docker pull ubuntu	: Downloading the ubuntu image or pull ubuntu image.
+
+docker images		: To see list of images.
+
+docker run -it --name cont1 ubuntu   : To create a container.
+
+-it (interactive)	: To go inside a container.
+
+cat /etc/os-release	: To see os release.
+
+apt update -y 		: To update the package, Note : without update we can't install any pkg in ubuntu.
+
+apt install git -y
+apt install apache2 -y 
+service apache2 start
+service apache2 status
+
+
+ctrl p q		: to exit the container.
+
+docker ps -a 		: To list all the containers.
+
+docker attach cont_name	: To go inside the container.
+
+docker stop cont_name	: To stop container.
+
+docker kill cont_namee  : To kill the container
+
+docker start cont_name	: To start container
+
+docker pause cont_name	: To pause container 
+
+docker unpause cont_name : To unpause container
+
+docker inspect cont_name : To get complete info of a container.
+
+docker rm cont_name	 : To delete a container.
+
+
+STOP : It will wait to finish all process running inside container.
+
+KILL : won't wait to finish all process running inside container.
+
+
+
+DAY-02 25/05/2024:
+------------------
+
+
+OS LEVEL OF VIRTUALIZATION:
+---------------------------
+--> If we want to backup the complete data from one container to multiple containers, that is called as OS level of virtualization.
+ 
+docker pull ubuntu
+docker run -it --name cont1 ubuntu
+apt update -y
+apt install mysql-server apache2 python3 -y
+touch file{1..5}
+apache2 -v
+mysql-server --version
+python3 --version
+ls
+
+ctrl pq --> To exit the container.
+
+docker commit cont1 raham:v1
+
+docker run -it --name cont2 raham:v1
+apache2 -v
+mysql-server --version
+python3 --version
+ls
+
+docker run -it --name cont3 raham:v1
+apache2 -v
+mysql-server --version
+python3 --version
+ls
+
+
+DOCKER FILE:
+------------
+--> This is an automation way to create image.
+--> Here, we use components to create image.
+--> In Docker file D must be capital
+--> Components also capital.
+--> This docker file will be reusable.
+--> Here, we can create image directly without container help.
+--> Name: Dockerfile
+
+docker kill $(docker ps -aq)    : To stop all the containers at a time.
+docker rm $(docker ps -aq)      : To delete all the containers at a time 
+docker rmi $(docker images -qa) : To delete all the images at a time.
+
+
+COMPONENTS:
+-----------
+FROM 		:  Used to base image.
+
+RUN		:  Used to run Linux commands (During image creation, It will install inside the image only).
+
+CMD		:  Used to run Linux commands (After container creation, It will install inside the container).
+
+ENTRYPOINT	:  High priority than cmd.
+
+COPY		:  To copy the local files to container.
+
+ADD		:  To copy internet files to container.
+
+WORKDIR		:  To open req directory.
+
+LABEL 		:  To add lables for docker images.
+
+ENV		:  To set env variables (inside the container).
+
+ARGS		:  To pass env variables (outside the container).
+
+EXPOSE 		:  To give port number.
+
+vim Dockerfile
+
+Ex. 1:
+------
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+
+docker build -t raham:v1 .
+docker run -it --name cont1 raham:v1
+
+Ex. 2:
+------
+FROM ubuntu
+RUN apt update -y 
+RUN apt install apache2 -y
+RUN apt install python3 -y
+CMD apt install mysql-server -y 
+
+docker build -t raham:v2 .
+docker run -it --name cont2 raham:v2
+
+Ex. 3:
+------
+FROM ubuntu
+COPY index.html /tmp
+ADD https://downloads.apache.org/tomcat/tomcat-9/v9.0.89/bin/apache-tomcat-9.0.89.tar.gz /tmp
+
+docker build -t raham:v3 .
+docker run -it --name cont3 raham:v3 
+
+Ex. 4:
+------
+FROM ubuntu
+COPY index.html /tmp
+ADD https://downloads.apache.org/tomcat/tomcat-9/v9.0.89/bin/apache-tomcat-9.0.89.tar.gz /tmp
+WORKDIR /tmp
+LABEL author rahamshaik
+
+docker build -t raham:v4 .
+docker run -it --name cont4 raham:v4
+
+Ex. 5:
+------
+FROM ubuntu
+LABEL author rahamshaik
+ENV client swiggy
+ENV server appserver
+
+docker build -t raham:v5 .
+docker run -it --name cont5 raham:v5
+
+
+NETFLIX DEPLOYMENT:
+-------------------
+
+yum install git -y 
+git clone "https://github.com/saibootla/netflix-clone.git"
+mv netflix-clone/* .
+
+In Dockerfile
+
+FROM ubuntu
+RUN apt update -y 
+RUN apt install apache2 -y
+COPY * /var/www/html/
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"] 
+
+Note : If we will not give FOREGROUND it will be on stopped state, we cannot access the application, thats'y we are passing FOREGROUND as an argument.
+
+Note : Staring the server, stopping and restarting we need to run these on CMD only (i.e, inside the container only).
+
+docker build -t netflix:v1 .
+docker run -it --name netflix -p 80:80 netflix:v1
+
+
+
+DAY-03 27/05/2024:
+------------------
+
+
+VOLUMES:
+--------
+
+--> It is used to store data inside the container.
+--> Volume is a simple directory inside container.
+--> Containers uses host resources (cpu, ram, rom).
+--> Single volume can be shared to multiple containers.
+--> Ex: cont-1 (vol-1) --> cont-2 (vol-1) & cont-3 (vol-1) etc,.
+--> At a time we can share single volume to single container only.
+
+
+METHOD-1: DOCKER FILE
+---------------------
+FROM ubuntu
+VOLUME ["/volume1"]
+
+docker build -t raham:v1 .
+docker run -it --name cont1 raham:v1
+
+cd volume1/
+touch file{1..5}
+cat>file1
+ctrl pq
+
+docker run -it --name cont2 --volumes-from cont1 ubuntu
+
+NOTE : When you create volume on the containers it will come to the docker host (local) also. Path is (var/lib/docker/volumes).
+
+
+METHOD-2: FROM CLI
+------------------
+docker run -it --name cont3 -v /volume2 ubuntu
+
+cd volume2/
+touch java{1..5}
+ctrl pq
+
+docker run -it --name cont4 --volumes-from cont3 ubuntu
+
+
+METHOD-3: VOLUME MOUNTING:
+--------------------------
+--> In this method we will create volume and then attaching to the container. 
+
+docker volume ls 		 :  To list the volumes.
+docker volume create volume_name :  To create volume.
+docker volume inspect volume3    :  To get info of volume3
+
+cd var/lib/docker/volumes/volume3/_data
+
+touch python{1..5}
+
+docker run -it --name cont5 --mount source=volume3,destination=/volume3 ubuntu  -->  Adding volume to the cont5 
+docker run -it --name cont6 --volumes-from cont5 ubuntu  -->  getting the volumes from cont5.
+
+docker volume rm		:  To delete the volume.
+docker volume prune 		:  To delete unused volumes.
+
+
+HOST --> CONTAINER
+
+cd /root 
+touch saikrishna{1..5}
+cp * /var/lib/docker/volumes/volume3/_data
+docker attach cont5
+ls /volume3
+
+
+DOCKER SYSTEM COMMANDS:
+-----------------------
+--> Used to know complete info about the docker elements.
+
+docker system df 	:  To give info of docker objects.
+docker system df -v 
+docker inspect cont4 | grep -i volume
+docker inspect cont5 | grep -i volume
+docker system prune 	:  To remove unused objects of docker.
+
+
+DOCKER MEMORY MANAGEMENT:
+-------------------------
+--> Containers uses our host resources (cpu, mem)
+--> By default we don't have any limits for containers, we need to set it.
+
+docker run -itd --name cont3 --memory="200mb" --cpus="0.2" ubuntu
+docker inspect cont3 
+docker stats
+
+
+
+DAY-04 28/05/2024:
+------------------
+
+
+vim Dockerfile 
+
+FROM ubuntu
+RUN apt update -y 
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+index.html --> Take it from the w3 schools
+
+docker build -t movies:v1 .
+docker run -it --name movies -p 81:80 movies:v1
+
+docker build -t train:v1 .
+docker run -it --name train -p 82:80 train:v1
+
+docker build -t dth:v1 .
+docker run -it --name dth -p 83:80 dth:v1
+
+docker build -t recharge:v1 .
+docker run -it --name recharge -p 84:80 recharge:v1
+
+
+docker ps -aq   		: To list the container id's
+
+docker kill $(docker ps -aq)	: To kill all the containers at a time 
+
+docker rm $(docker ps -aq)	: To remove all the containers.
+
+
+NOTE : In the above process all the containers are managed and created one by one in real time we manage all the containers at same time.
+       So for that purpose we are going to use the concept called docker compose.
+
+
+DOCKER COMPOSE:
+---------------
+--> It's a tool used to manage multiple containers in single host.
+--> We can create, start, stop, and delete all containers together.
+--> We write the container information in a file called compose file.
+--> Compose file in YAML format.
+--> Inside the compose file we can give images, ports, and volumes info of containers.
+--> It is not a built in tool in docker, we need to download and use it.
+
+
+INSTALLATION:
+-------------
+vim docker-compose.sh
+sh docker-compose.sh
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+ls /usr/local/bin/
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+
+--> In Linux majorly you are having two types of commands. First one is inbuilt commands which comes with the operating system.
+--> And second type is download commands we are going to download with the help of yum, apt, and amazon linux extras.
+
+--> Some commands we can download on binary files.
+
+NOTE : --> Linux will not give some commands , so to use them we need to download seperately.
+       --> Once a command is downloaded we need to move it to /usr/local/bin.
+       --> Because all the user-executed commands in Linux will store in /usr/local/bin.
+       --> chmod + x is to give the executable permission to the command.
+
+
+vim docker-compose.yml
+
+version: '3.8'  --> version of the docker compose with the docker engine.
+services:
+  movies:
+    image: movies:v1
+    ports:
+      - "81:80"
+  train:
+    image: train:v1
+    ports:
+      - "82:80"
+  dth:
+    image: dth:v1
+    ports:
+      - "83:80"
+  recharge:
+    image: recharge:v1
+    ports:
+      - "84:80"
+
+
+COMMANDS:
+---------
+docker-compose up -d 		:  To create and start all the containers
+
+docker-compose stop    	        :  To stop all containers
+
+docker-compose start            :  To start all containers
+
+docker-compose kill 		:  To kill all containers
+
+docker-compose rm 		:  To delete all containers
+
+docker-compose down 		:  To stop and delete all the containers
+
+docker-compose pause		:  To pause all containers
+
+docker-compose unpause 		:  To unpause all containers
+
+docker-compose ps -a 		:  To list the containers managed by the compose file.
+
+docker-compose images  		:  To list the images managed by the compose file.
+
+docker-compose logs		:  To show the logs docker compose 
+
+docker-compose top		:  To show the process of compose containers.
+
+docker-compose restart		:  To restart all the compose containers.
+
+docker-compose scale train=10   :  To scale the service.
+
+
+DOCKER HUB:
+-----------
+Git (local) --> Github (internet) = to access by others.
+Image (local) --> Docker hub = to access by others.
+
+Replace your user name
+
+STEPS:
+------
+create dockerhub account 
+create a repository
+
+docker tag movies:v1 saibootla/movies
+docker login --> username and password
+docker push saibootla/movies
+
+docker tag train:v1 saibootla/train
+docker push saibootla/train
+
+docker tag dth:v1 saibootla/dth
+docker push saibootla/dth
+
+docker tag recharge:v1 saibootla/recharge
+docker push saibootla/recharge
+
+docker rmi -f $(docker images -q)
+docker pull saibootla/movies:latest
+
+
+DAY-05 29/05/2024:
+------------------
+
+
+HIGH AVAILABILITY : More than one server.
+
+WHY : If one server got deleted then other server will gives the application.
+
+
+DOCKER SWARM:
+-------------
+--> It's an orchestration tool.
+--> Used to manage multiple containers on multiple servers.
+--> Here we create a cluster (group of servers).
+--> In that cluster we can create same container on multiple servers.
+--> Here we have the manager node and worker node.
+--> Manager node will create & distribute the container to the worker node.
+--> Worker node's main purpose is to maintain the container.
+--> Without the docker engine we can't create the cluster.
+--> Port : 2377
+--> Worker node will join on cluster by using a token.
+--> Manager node will give the token.
+
+
+SETUP:
+------
+Create 3 servers.
+Install docker and start the service.
+hostnamectl set-hostname manager/worker-1/worker-2
+Enable 2377 port
+
+docker swarm init (Manager node) --> copy-paste the token to worker nodes.
+docker node ls 
+
+NOTE : --> Individual containers are not going to replicate. 
+       --> If we create a service then only containers will be distributed.
+
+SERVICE : --> It's a way of exposing and managing multiple containers.
+          --> In service we can create copy of containers. That container copies will be distributed to all the nodes.
+
+service --> it will create containers --> distributed to nodes.
+
+COMMANDS:
+---------
+docker service create --name movies --replicas 3 -p 81:80 saibootla/movies:latest
+
+docker service ls 		: To list the services
+
+docker service inspect movies 	: To get complete info of service
+
+docker service ps movies 	: To list the containers of movies.
+
+docker service scale movies=10	: To scale in the containers
+
+docker service scale movies=3 	: To scale out the containers.
+
+docker service rollback movies	: To go previous state
+
+docker service logs movies	: To see the logs
+
+docker service rm movies 	: To delete the services.
+
+Note : When you scale down it follows the LIFO approach (Last in-First out).
+
+Note : If you delete a container it will recreate automatically. It is called as self healing.
+
+
+CLUSTER ACTIVITIES:
+-------------------
+docker swarm leave (Worker node)	: To make node inactive from cluster.
+To activate the node copy the token.
+
+docker node rm node_id (Manager)	: To delete worker node which is in down state.
+
+docker node inspect node_id 		: To get complete info of the worker node.
+
+docker swarm join-token manager		: To generate the token to join.
+
+Note : We can't delete the node which is in ready state.
+
+--> if we want to join the node to cluster again we need to paste the token on worker node.
+
+
+DOCKER NETWORKING:
+------------------
+--> Docker networking are used to make communication between the multiple containers that are running 
+    on same or different docker hosts.
+
+--> We have different types of docker networks.
+
+Bridge Network 	: It's a default network that container will communicate with each within the same host.
+
+Overlay Network	: Used to communicate containers with each other across the multiple docker hosts.
+
+Host Network	: When you want your container IP and ec2 instance IP same then you use host network.
+
+None Network	: When you don't want to expose the container to the world, we use none network. It will not provide any network to our container.
+
+COMMANDS:
+---------
+To create a network	: docker network create network_name
+
+To see the list		: docker network ls
+
+To delete a network 	: docker network rm network_name
+
+To inspect 		: docker network inspect network_name
+
+To connect a network to the container	: docker network connect network_name container_id/name
+
+docker exec -it cont1 container_name /bin/bash --> going to the bash shell of the cont1
+
+apt update 
+apt install iputils-ping -y	: command to install ping checks 
+ping ip-address of cont2 	: To check the cont2 is communicating with the cont1 or not.
+
+To disconnect from the container	: docker network disconnect network_name container_name
+To prune 				: docker network prune.
+
+
+DAY-06 30/05/2024:
+------------------
+
+
+DOCKER PROJECT:
+---------------
+
+yum install docker -y 
+systemctl start docker
+systemctl status docker
+
+
+DOCKER FILE:
+------------
+FROM ubuntu
+RUN apt-get update -y
+RUN apt-get install apache2 -y
+COPY index.html /var/www/html/
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+
+DOCKER FILE	: To create image by automation.
+DOCKER COMPOSE	: To create multiple containers on single server.
+DOCKER SWARM	: To create single containers on multiple servers.
+DOCKER STACK	: Docker Swarm + Docker Compose
+
+
+1. CREATE 3 SERVERS AND INSTALL DOCKER ON ALL OF THEM & CREATE CLUSTER OF IT
+----------------------------------------------------------------------------
+
+yum install docker -y
+systemctl start docker
+systemctl status docker 
+
+docker swarm init 
+docker node ls 
+
+2. INSTALLING JENKINS (MASTER NODE):
+------------------------------------
+
+vim jenkins.sh
+sh jenkins.sh
+
+3. CREATE CUSTOM IMAGES AND PUSH TO DOCKERHUB WITH TAGS:
+--------------------------------------------------------
+DOCKER FILE:
+------------
+
+FROM ubuntu
+RUN apt-get update -y
+RUN apt-get install apache2 -y
+COPY index.html /var/www/html/
+CMD ["/usr/sbin/apachectl" "-D", "FOREGROUND"]
+
+PIPELINE:
+---------
+
+pipeline {
+    agent any 
+    
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/RAHAMSHAIK007/dockernewproject.git'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'docker build -t $img .'
+            }
+        }
+        stage('tag') {
+            steps {
+                sh 'docker tag $img $repo'
+            }
+        }
+        stage('push') {
+            steps {
+                sh 'docker login -u saibootla -p $password'
+                sh 'docker push $repo'
+            }
+        }
+    }
+}
+
+
+4. GIVE PERMISSIONS:
+--------------------
+
+chmod 777 /var/run/docker.sock
+systemctl daemon-reload
+systemctl restart docker.service
+
+
+5. WRITE COMPOSE FILE AND PUSH TO GITHUB:
+-----------------------------------------
+
+version: '3.8'
+services:
+  movies:
+    image: saibootla/moviesrepo:latest
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 3
+  train:
+    image: saibootla/trainrepo:latest
+    ports:
+      - "81:80"
+    deploy:
+      replicas: 3
+  dth:
+    image: saibootla/dthrepo:latest
+    ports:
+      - "82:80"
+    deploy:
+      replicas: 3
+  recharge:
+    image: saibootla/rechargerepo:latest
+    ports:
+      - "83:80"
+    deploy:
+      replicas: 3
+
+
+DOCKER STACK:
+-------------
+
+--> Docker stack is used to create multiple services on multiple hosts.
+--> i.e., it will create multiple containers on multiple servers with the help of compose file.
+--> To use the docker stack we have initialized docker swarm , If we are not using docker swarm docker stack won't work.
+--> Once we remove the stack automatically all the containers will get deleted.
+--> We can share the containers from manager to worker according to the replicas.
+
+Ex : --> Let's assume if we have 2 servers which is manager and worker , If we deployed a stack with 4 replicas , 2 are present in manager
+         2 are present in worker node.
+     --> Here manager will divide the work based on the load on a server.
+
+
+COMMANDS:
+---------
+
+TO DEPLOY	: docker stack deploy stack_name -c docker-compose.yml
+TO LIST		: docker stack ls 
+
+TO GET CONTAINERS OF A STACK	: docker stack ps stack_name
+TO GET SERVICES OF A STACK	: docker stack rm stack_name
+
+
+PORTAINER:
+----------
+
+--> It is a container organizer, designed to make tasks easier, whether they are clustered or not.
+--> Able to connect multiple clusters , access the containers , migrate the stacks between the clusters.
+--> It is not a testing environment, mainly used for production routines in large companies.
+--> Portainer consists of two elements, the Portainer Server and Portainer Agent.
+--> Both elements run as lightweight Docker containers on a Docker engine.
+
+SETUP:
+------
+
+--> Must have swarm mode and all ports enable with docker engine
+
+curl -L https://downloads.portainer.io/ce2-16/portainer-agent-stack.yml -o portainer-agent-stack.yml
+docker stack deploy -c portainer-agent-stack.yml portainer
+ docker ps
+
+--> public-ip of swarm master:9000
+
+ 
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,305 @@
+18-04-2024
+
+DEVOPS: TO DELIVER THE APP/PRODUCT/SOFTWARE SPEEDILY
+
+SDLC: SOFTWARE DEVELOPMENT LIFECYCLE
+DEPLOYMENT: process of installing the 6application to the server.
+
+HUMANS: Infant -- > Toddler -- > Child -- > Teen -- > Adult -- > Old
+BABY: MEN & WOMENT
+
+APPLICATION:
+DEV & OPS  
+
+PLAN
+CODE 
+BUILD
+TEST
+DEPLOY
+OPERATE
+MONITOR
+
+
+
+COURSE: DEVOPS WITH AWS
+FREE: LINUX
+DURATION: 2.5 MONTHS 
+FEE: 10K (16K FOR REC +)
+TIMINGS: 6:00 TO 7:30 PM
+CLASS: 70 MINUTES (2O MINS INTERACTIVE)
+EXP: 3+ 
+LABS: 9 AM - 7 PM
+PROJECTS: 5 PROJECTS
+TOOLS: 18 TOOLS
+
+=============================================================================
+
+SOFTWARE ARCHITECTURE:
+Blueprint of the application workflow.
+
+TYPES:
+1. ONE-TIER ARCHITECTURE
+2. TWO-TIER ARCHITECTURE
+3. THREE-TIER ARCHITECTURE
+4. N-TIER ARCHITECTURE
+
+TIER = LAYER = SERVER
+
+SERVER: to serve the services to end user.
+
+1. web server  : presentation layer
+2. app server  : business/logic layer
+3. db server   : data server
+
+
+WEB SERVER: httpd
+AKA	  : the presentation layer
+Purpose   : to show the app
+Who	  : UI/UX (front-end dev)
+What	  : Web Technologies
+EX	  : html, css, js
+
+
+APP SERVER: tomcat
+AKA	  : Business/Logic layer
+Purpose	  : to use the app
+Who       : Backend Dev
+What	  : Programming languages
+Ex        : java, python, c, c++, .net
+
+
+DB SERVER: mysql
+AKA       : data server
+Purpose   : to store & retrieve data
+Who	  : DBA/DBD
+What      : DB languages
+Ex	  : mysql, mssql, postgres, arango, oracle ---
+
+
+
+1. ONE-TIER ARCHITECTURE : (STANDALONE APP)
+ALL 3 LAYERS WILL BE ON LOCAL.
+HERE THE APP WILL WORK ON OUR LAPTOP.
+IT DOESN'T REQ INTERNET CONNECTION.
+
+EX: VLC 
+
+2. TWO-TIER ARCHITECTURE : (CLIENT-SERVER APP)
+WEB & APP = LOCAL 
+DB = INTERNET
+IT REQ INTERNET CONNECTION.
+
+EX: BANKING APPS
+
+3. THREE-TIER ARCHITECTURE : (WEB APP)
+APP NEED NOT TO INSTALL
+WE CAN USE ANY APP FROM THE INTERNET
+
+EX: ALL THE APP
+=====================================================================================
+SERVER: Serves the services to end user.
+it will take request from user and send response.
+
+
+PHYSICAL SERVERS:
+ 
+1. It will consume space
+2. 24/7 electricity
+3. maintenance
+
+CLOUD SERVERS:
+AWS
+AZURE
+GCP
+
+AWS : AMAZON WEB SERVICES
+SERVER: EC2 -- > ELASTIC COMPUTE CLOUD
+
+
+TO CREATE SERVER ON AWS, IT WILL TAKE 7 STEPS
+
+1. NAME & TAGS : 
+
+2. AMI : AMAZON MACHINE IMAGE
+   WE HAVE OS, SOFTWARE PKGS
+
+3. INSTANCE TYPE: CPU & MEMORY
+   T2.MICRO : 1 CPU & 1 RAM 
+
+4. KEYPAIR: USED TO LOGIN 
+   HERE WE HAVE 2 KEYS 
+   1. PUBLIC KEY   : AWS
+   2. PRIVATE KEY  : USER   (PEM, PPK)
+
+5. NETWORK: 
+   VPC : PRIVACY & SECURITY FOR SERVER
+   SG  : TO ACCESS THE APPLICATIONS (PORTS : 0 - 65535)
+
+6. STORAGE: EBS VOLUME
+   TO PROVIDE STORAGE FOR THE SERVER 
+   DEFAULT: 8GB   MAX: 16 TB
+
+7. summary
+
+
+
+LINUX:
+It is an os -- > Blender
+
+os: Operating system: 
+its a software used to communicate with systems.
+
+Linux is a Kernel.
+Kernel: it is lowest level of operating system.
+
+
+WHY WE NEED TO LEARN LINUX:
+1. TOP 500 SUPER COMPUTERS
+2. 96% SERVERS
+3. 86% mobiles
+4. Electronic Gadgets
+
+ADVANTAGES:
+1. FREE AND OPEN-SOURCE
+2. SECURITY WILL BE HIGH
+3. HIGH PERFORMANCE
+4. MULTI USER BASED
+5. IT SUPPORTS ALL PROGRAMMING LANGUAGES
+6. HIGH SPEED
+
+COMPONENTS:
+1. SHELL: deal with input & outputs.
+2. DAEMON: deal with background processs.
+3. Kernel: deals with hardware. (cpu, ram, rom)
+
+FLAVOURS/DISTRIBUTION:
+IPHONE15 -- > 15 + -- > 15 PRO -- > PRO MAX
+
+UBUNTU   : 70%
+REDHAT
+CENTOS
+FEDORA
+DEBIAN
+ROCKY LINUX
+KALI LINUX
+ALMA LINUX
+
+
+TYPES:
+1. GUI : GRAPHICAL USER INTERFACE
+2. CLI : COMMAND LINE INTERFACE
+
+COMMANDS:
+
+sudo -i		: to login as root user
+uname 		: to show the os name
+uname -r	: to show the os kernel info
+uname -a	: to show complete info of os
+who/w		: to show the logged user info
+whoami		: to show current user info
+clear/ ctrl l	: to clear the screen
+logout /ctrl d	: to logout from the current user
+date		: time and date
+hostname 	: to print the hostname
+hostnamectl set-hostname raham : it will set the hostname
+
+FILE COMMANDS:
+
+touch filename: to create a file
+ls/ll			: to list the file
+cat file1		: to show content in file1
+more file1		: to show content in file1
+cat>>file1		: to insert the content in a file
+enter + ctrl d 		: to save the content
+cp file1 file2		: to copy content from file1 to file2
+mv file1 raham		: to rename file1 as raham
+rm file1		: to remove a file
+rm file3 -f		: to remove a file forcefully
+rm * -f			: to remove all files forcefully
+touch file{1..100}	: to create file1 to file100
+wc file1		: to print lines, words and characters of a file
+
+
+head file1		: to print top 10 lines
+head -5 file1		: to print top 5 lines
+head -12 file1		: to print top 12 lines
+tail file1		: to print bottom 10 lines
+tail -5 file1		: to print bottom 5 lines
+tail -12 file1		: to print bottom 12 lines
+sed -n '7,14p' file1	: to print from line 7 to 14
+
+mkdir dir1		: to create a directory
+cd dir1			: to change to dir1
+cd ..			: to come a dir back 
+
+HARDWARE COMMANDS:
+cat /proc/cpuinfo	: to show cpu information
+lscpu			: to show cpu information
+cat /proc/meminfo	: to show memory information
+lsmem			: to show memory information
+fdisk -l		: to show ebs volume
+lsblk			: to show ebs volume
+yum install lshw	: to install lshw package
+lshw			: to show complete hardware information
+cat /etc/os-release	: to show flavour of os
+
+
+==========================================================================================
+
+EDITORS:
+is to edit/modify the content in a file.
+types:
+1. vi/vim
+2. nano
+
+i	: to insert the conetnt
+esc	: to exit from insert mode
+
+1. command mode
+2. insert mode
+3. save mode
+
+
+SAVE MODE:
+:w	: to save the content
+:q	: to quit from file
+:wq	: to save & quit 
+:wq!	: to save & quit forcefully
+
+INSERT MODE:
+i	: to insert the content
+I	: starting of the line
+A	: to end of the line
+O	: creats new line above existing line
+o	: crerate new line below existing line
+
+COMMAND MODE:
+
+gg	: top of file
+shift g	: bottom of file
+:set nu : print number of lines inside the file
+:10	: to go to 10th line (10gg)
+yy	: to copy single line
+3yy	: to copy three lines
+p	: to past for single time
+3p	: to past for 3 times
+dd	: to delete single line
+3dd	: to delete three lines
+u	: undo
+ctrl r	: to redo
+
+==================================================================
+
+GREP: Global Regular Expression Print
+Purpose: to find the words in a file
+
+
+grep word file1		: to search for a word in file1
+grep word file1 -c	: to print the count of word
+grep word file1 -i	: ignores case sensitive
+grep word file1	-v	: to avoid the lines which have the word
+grep 'word1\|word2' file1: to search for multiple words
+
+
+
+==============================================================

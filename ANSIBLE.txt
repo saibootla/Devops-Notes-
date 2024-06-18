@@ -1,0 +1,995 @@
+DAY-01 16/05/2024:
+-----------------
+
+Automated 	: Deployment, Installation
+Non Automated 	: Server
+
+To perform end to end automation we can use Ansible, Such as 
+
+--> Create servers
+--> Configure servers
+--> Deployment application on servers 
+
+
+ANSIBLE:
+--------
+--> It is a configuration management tool.
+--> Ansible is used to manage and work with multiple servers together.
+--> It's a free and open source
+
+Configuration 	: Hardware and Software properties of a server.
+Management    	: Updating packages, Installing packages, Removing packages.
+
+--> It is used to automate the entire deployment process on multiple servers.
+--> We need to install python on Ansible.
+--> We use a key-value format for the playbooks.
+
+
+PLAYBOOK:
+---------
+--> Playbook is used to Create servers, Install packages & software, Deploy applications ---
+
+Jenkins -->  Pipeline  --> Groovy
+Ansible -->  Playbooks --> yaml
+
+
+HISTORY:
+--------
+--> In 2012 dev called Maichel Dehaan who developed ansible.
+--> After few years red hat taken by ansible.
+--> It is platform independent & will work on all linux flavours.
+
+
+ARCHITECTURE:
+-------------
+PLAYBOOK  : It's a file which consists of code. That code may be creating a server, installing softwares & packages etc.,
+
+INVENTORY : It's a file which consists of IP addresses of the worker nodes.
+
+SSH	  : Used to connect with nodes.
+
+--> Ansible is agent less. It's mean we don't need to install any software in worker nodes.
+
+
+SETUP:
+------
+--> Create 5 servers [1=Ansible, 2=dev, 2=test].
+
+--> Execute the below commands on all the servers:
+
+sudo -i  -->  To login as a root user
+hostnamectl set-hostname ansible/dev-1/dev-2/test-1/test-2
+sudo -i
+
+passwd root --> Used to login to other servers.
+vim /etc/ssh/sshd_config (38 & 61 uncomment both lines)
+systemctl restart sshd 
+systemctl status sshd 
+hostname -i
+
+--> THE BELOW COMMANDS ARE NEED TO BE RUN ON ANSIBLE SERVER:
+
+amazon-linux-extras install ansible2 -y
+yum install python3 python-pip python-dlevel -y
+
+vim /etc/ansible/hosts --> Inventory file, we need to keep our IP adresses of the worker nodes. Without this main server won't allows you to work with worker nodes.
+
+# Ex 1: Ungrouped hosts, specify before any group headers.
+[dev]
+172.31.20.40
+172.31.21.25
+[test]
+172.31.31.77
+172.31.22.114
+
+ssh-keygen --> Enter 4 times
+
+ssh-copy-id root@private ip of dev-1 --> yes --> password --> ssh private ip --> ctrl d (or) logout.
+ssh-copy-id root@private ip of dev-2 --> yes --> password --> ssh private ip --> ctrl d (or) logout.
+ssh-copy-id root@private ip of test-1 --> yes --> password --> ssh private ip --> ctrl d (or) logout.
+ssh-copy-id root@private ip of test-2 --> yes --> password --> ssh private ip --> ctrl d (or) logout.
+
+ansible -m ping all : To check worker node connection with ansible server.
+
+
+1. ADHOC COMMANDS:
+------------------
+--> These are the simple linux commands.
+--> These are used for temporary purpose.
+--> These commands will be over ridden.
+
+ansible all -a "yum install git -y"
+ansible all -a "yum install maven -y"
+ansible all -a "mvn --version"
+ansible all -a "touch file1"
+ansible all -a "touch raham.txt"
+ansible all -a "ls"
+ansible all -a "yum install httpd -y"
+ansible all -a "systemctl status httpd"
+ansible all -a "systemctl start httpd"
+ansible all -a "useradd raham"
+ansible all -a "cat /etc/passwd"
+ansible all -a "yum remove git* maven* httpd* -y"
+
+
+DAY-02 17/05/2024:
+------------------
+
+
+2. MODULES:
+-----------
+--> It's a key-value pair.
+--> Modules are reusable.
+--> We can use different modules for different purposes.
+--> Module flag is -m
+
+ansible all -m yum -a "name=git state=present"
+
+ansible all -m yum -a "name=maven state=present"   	[present = installed]
+
+ansible all -m service -a "name=httpd state=started"   	[started = restart]
+
+ansible all -m service -a "name=httpd state=stopped"	[stopped = stop]
+
+ansible all -m yum -a "name=httpd state=absent"		[absent = uninstall]
+
+ansible all -m user -a "name=vikram state=present"
+
+ansible all -m user -a "name=vikram state=absent"
+
+ansible all -m copy -a "src=raham.text dest=/tmp"
+
+
+3. PLAYBOOKS:
+-------------
+--> Playbooks is used to execute multiple modules.
+--> We can reuse the playbook multiple times.
+--> In real time we use a playbook to automate our work, for deployment, package installation, etc.,
+--> Here we use key-value pairs.
+--> Key-value can also be called as dictionary.
+--> Ansible playbook will be written on YAML (Yet Another Markup Language) syntax.
+--> Extension for playbook is .yml or .yaml
+--> Play book starts with --- and ends with ... (optional).
+
+Ex.1:
+-----
+
+- hosts: all
+  tasks:
+     - name: installing git
+       yum: name=git state=present
+
+     - name: installing httpd
+       yum: name=httpd state=present
+
+     - name: starting httpd
+       service: name=httpd state=started
+
+     - name: creating user
+       user: name=saikrishna state=present
+
+     - name: copying a file
+       copy: src=index.html dest=/root
+
+NOTE : If you want to install the packages on any particular server give dev, dev[0], dev[1], test, test[0], test[1]
+
+TO EXECUTE PLAYBOOK : ansible-playbook playbook.yml
+
+GATHERING FACTS : It will get information of worker nodes. It's by default task performed by ansible.
+
+OK : Total number of tasks performed by ansible.
+
+CHANGED : No.of tasks successfully executed.
+
+Ex.2:
+-----
+
+- hosts: all 
+  ignore_errors: true
+  tasks:
+      - name: uninstalling git
+        yum: name=git state=absent
+
+      - name: uninstalling httpd 
+        yum: name=httpd state=absent
+
+      - name: starting httpd
+        service: name=httpd state=started
+
+      - name: removing user
+        user: name=saikrishna state=absent
+
+      - name: copying a file 
+        copy: src=raham.txt dest=/root
+
+
+SETUP MODULE:
+-------------
+--> Used to print the complete information about the worker nodes.
+
+Command : ansible all -m setup
+
+ansible all -m setup | grep -i family
+ansible all -m setup | grep -i pkg
+ansible all -m setup | grep -i cores
+
+
+
+DAY-03 18/05/2024:
+------------------
+
+
+TAGS:
+-----
+--> By default ansible will execute all the tasks sequentially in a playbook.
+--> We can use tags to execute a specific tasks or to skip a specific tasks.
+
+Ex.1:
+-----
+- hosts: all
+  ignore_errors: true
+  tasks:
+     - name: installing git
+       yum: name=git state=present
+       tags: a 
+
+     - name: installing httpd
+       yum: name=httpd state=present
+       tags: b
+
+     - name: starting httpd
+       service: name=httpd state=started
+       tags: c
+
+     - name: create a user
+       user: name=saikrishna state=present
+       tags: d
+
+     - name: copy a file
+       copy: src=index.html dest=/tmp
+       tags: e
+
+SINGLE TAG  :  ansible-playbook playbook.yml --tags d
+
+MULTI TAGS  :  ansible-playbook playbook.yml --tags b,c
+
+
+Ex.2:
+-----
+- hosts: all
+  ignore_errors: true
+  tasks:
+     - name: uninstalling git
+       yum: name=git state=absent
+       tags: a 
+
+     - name: uninstalling httpd 
+       yum: name=httpd state=absent
+       tags: b
+
+     - name: starting httpd
+       service: name=httpd state=started
+       tags: c
+
+     - name: delete a user
+       user: name=saikrishna state=absent
+       tags: d
+     
+     - name: copy a file
+       copy: src=index.html dest=/tmp
+       tags: e
+
+SKIP A SINGLE TASK  :  ansible-playbook playbook.yml --skip-tags "c"
+       
+SKIP MULTIPLE TASKS :  ansible-playbook playbook.yml --skip-tags "a,c"
+
+
+VARIABLES:
+----------
+--> Variables is used to store the values.
+
+STATIC VARIABLES:
+-----------------
+--> We can define these variables inside the playbook and use for multiple times.
+--> Once a variable is defined here it will not change until we change.
+
+- hosts: all
+  vars:
+    a: maven
+    b: httpd
+  tasks:
+    - name: installing maven
+      yum: name={{a}} state=present
+
+    - name: installing httpd
+      yum: name={{b}} state=present
+
+TO EXECUTE : ansible-playbook playbook.yml
+
+
+DYNAMIC VARIABLES:
+------------------
+--> These variables will be defined outside the playbook.
+--> And these will change as per our requirements.
+
+- hosts: all
+  vars:
+  tasks:
+     - name: installing maven
+       yum: name={{a}} state=absent
+
+     - name: installing httpd 
+       yum: name={{b}} state=absent
+
+--> ansible-playbook playbook.yml --extra-vars "a=maven b=httpd"
+
+
+LOOPS:
+------
+--> We can use loops to reduce the length of the code for the playbook.
+
+Ex.1:
+-----
+
+- hosts: all
+  tasks: 
+     - name: installing packages
+       yum: name={{item}} state=present
+       with_items:
+          - git
+          - maven
+	  - httpd
+	  - docker
+ 	  - java-1.8.0-openjdk
+
+--> Check all the servers if the softwares are installed or not.
+
+ansible all -a "git -v"
+ansible all -a "mvn -v"
+ansible all -a "httpd -v"
+ansible all -a "docker -v"
+ansible all -a "java-1.8.0-openjdk"
+
+
+- hosts: all
+  tasks:
+     - name: uninstalling pkg-1
+       yum: name={{item}} state=absent
+       with_items:
+           - git
+	   - maven
+           - htppd
+	   - docker
+           - java-1.8.0-openjdk"
+
+Ex.2:
+-----
+
+- hosts: all
+  tasks:
+     - name: creating users
+       user: name={{item}} state=present
+       with_items:
+          - anil
+	  - saikrishna
+	  - ramprasad
+	  - rajesh
+	  - shiva
+
+- hosts: all
+  tasks:
+     - name: deleting users
+       user: name={{item}} state=absent
+       with_items:
+	  - anil
+	  - saikrishna
+	  - ramprasad
+	  - rajesh
+	  - shiva
+
+
+HANDLERS:
+---------
+--> When we have two tasks in a single playbook if task-1 is depending upon task-2, then we can use the concept called handlers.
+--> Once the task-1 is executed successfully it will notify task-2 to perform the operation.
+--> The name of the notify and the name of the task two must be same.
+
+- hosts: all
+  tasks:
+     - name: installing httpd
+       yum: name=httpd state=present
+       notify: starting httpd
+
+  handlers:
+     - name: starting httpd 
+       service: name=httpd state=started
+
+--> sed -i "s/present/absent/g; s/installing/uninstalling/g" playbook.yml
+
+- hosts: all
+  tasks:
+     - name: uninstalling httpd
+       yum: name=httpd state=absent
+       notify: starting httpd
+
+  handlers:
+     - name: starting httpd 
+       service: name=httpd state=started
+
+
+SHELL VS COMMAND VS RAW:
+------------------------
+
+- hosts: all
+  tasks:
+     - name: installing maven
+       shell: yum install maven -y
+
+     - name: installing httpd
+       command: yum install httpd -y
+
+     - name: installing docker
+       raw: yum install docker -y
+
+NOTE : Shell, Command, and Raw both will do the same work.
+
+raw >> command >> shell
+
+
+DAY-04 20/05/2024:
+------------------
+
+
+CONDITIONS:
+-----------
+
+CLUSTER      : A group of servers
+
+HOMOGENIUS   : All servers having same OS and same flavour.
+
+HETEROGENIUS : All servers having different OS and different flavour.
+
+--> Conditions are basically used to execute when we have a particular requirement.
+--> Used to execute this module when we have different clusters.
+
+RedHat = yum
+Ubuntu = apt
+
+Ex :
+----
+- hosts: all
+  tasks:
+     - name: installing git on RedHat
+       yum: name=git state=present
+       when: ansible_os_family == "RedHat"
+
+     - name: installing git on Ubuntu
+       apt: name=git state=present
+       when: ansible_os_family == "Ubuntu"
+
+
+LAMP STACK:
+-----------
+--> In Linux operating system, if you install Apache, Mysql, Python then it is called as LAMP stack.
+
+L : Linux
+A : Apache
+M : Mysql
+P : Python
+
+- hosts: all
+  tasks:
+     - name: installing Apache
+       yum: name=httpd state=present
+     
+     - name: installing Mysql
+       yum: name=mysql state=present
+
+     - name: installing Python
+       yum: name=python3 state=present
+
+--> Check if it's installed in all the servers or not.
+
+ansible all -a "httpd --version"
+ansible all -a "mysql --version"
+ansible all -a "python3 --version"
+
+
+DEBUG:
+------
+--> To print the messages from a playbook.
+
+- hosts: all
+  tasks: 
+     - name: printing a message
+       debug:
+         msg: Hai all welcome to my session.
+
+
+NAME   : ansible_nodename
+FAMILY : ansible_os_family
+PKG    : ansible_pkg_mgr
+CPU    : ansible_processor_cores
+MEM    : ansible_memtotal_mb
+FREE   : ansible_memfree_mb
+
+
+- hosts: all
+  tasks:
+     - name: printing information about the worker nodes
+       debug:
+          msg: "my node name is: {{ansible_nodename}}, the os is: {{ansible_os_family}}, the package manager is: {{ansible_pkg_mgr}},
+               total cpus is: {{ansible_processor_cores}}, the total ram: {{ansible_memtotal_mb}}, free ram is: {{ansible_memfree_mb}}"
+
+
+JINJA2 TEMPLATE:
+----------------
+--> Used to get the customized output, here is a text file which can extract the variables and these values will change as per time.
+
+
+LOOKUPS:
+--------
+--> This module used to extract (or) get the data from the files, db and key-values.
+
+- hosts: dev
+  vars:
+    a: "{{lookup('file', '/root/creds.txt')}}
+  tasks:
+    - debug:
+        msg: "Hai my user name is {{a}}"
+
+
+cat creds.txt
+user=raham
+password=test123
+
+
+STRATAGIES:
+-----------
+--> Way of executing the playbook.
+
+LINEAR : Executing tasks sequentially.
+
+--> If task-1 is executed on server-1 it will wait till task-2 execution.
+
+FREE : Executing all the tasks on all node at same time.
+
+--> If task-1 is executed on server-1 it won't wait till task-2 execution.
+
+ROLLING :
+
+BATCH: 
+
+
+
+DAY-05 21/05/2024:
+------------------
+
+
+ROLES:
+------
+--> Roles is a way of organising playbooks in a structured format.
+--> Main purpose of the roles is to encapsulate the data, means hiding the data.
+--> We can reuse the roles multiple times.
+--> Length of the playbook is decreased.
+--> It contains on vars, templates, task, ---
+--> In real time we use roles for our daily activities.
+
+yum install tree -y
+
+mkdir playbooks
+cd playbooks
+
+mkdir -p roles/pkgs/tasks --> -p: parenting directory
+
+vim roles/pkgs/tasks/main.yml
+
+- name: installing packages
+  yum: name=git state=present
+
+- name: installing maven
+  yum: name=maven state=present
+
+- name: installing docker
+  yum: name=docker state=present
+
+
+mkdir -p roles/users/tasks
+vim roles/users/tasks/main.yml
+
+
+- name: creating users
+  user: name={{item}} state=present
+  with_items:
+    - saikrishna
+    - anil
+    - ram prasad
+    - rajesh
+    - srikanth
+
+
+mkdir -p roles/webserver/tasks
+vim roles/webserver/tasks/main.yml
+
+
+- name: installing httpd
+  yum: name=httpd state=present
+
+- name: starting httpd 
+  service: name: httpd state=started
+
+
+vim master.yml
+
+- hosts: all
+  roles: 
+    - pkgs
+    - users
+    - webserver
+
+--> If we want to renaming a file, in the subfolders use this command.
+
+Command : find . -type f -exec sed -i 's/present/absent/g' {} \
+
+
+ANSIBLE GALAXY:
+---------------
+--> Ansible galaxy is a website where usres can share roles and to a command line tool for installng, creating and managing roles.
+--> Ansible galaxy will gives greater visbility to one of ansible's most exciting features, such as application installation, or reusable roles for server configuration.
+--> Lot's of people share roles in the ansible galaxy.
+--> Ansible roles consists of many playbooks, which is a way to group multiple tasks into the container to do the automation in a very effective manner with clean, directory structures
+
+
+ANSIBLE VAULT:
+--------------
+--> It is used to encrypt the files, playbooks, ---
+--> Technique : AES256 (Used by facebook)
+--> Vault will store our data very safely and securely.
+--> If we want to access any data which is in the vault we need to give a password.
+
+NOTE : We can restrict the users to access the playbook also.
+
+cat creds.txt
+user=raham
+password=test123
+
+
+ansible-vault create creds1.txt	     :  To create a vault
+ansible-vault edit creds1.txt	     :  To edit a vault
+ansible-vault rekey creds1.txt	     :  To change the password for a vault
+ansible-vault decrypt creds1.txt     :  To decrypt the content
+ansible-vault encrypt creds1.txt     :  To encrypt the content
+ansible-vault view creds1.txt        :  To show the content without decrypt
+
+
+PIP MODULE:
+-----------
+--> It's a pkg manager used to install python libs/ modules.
+
+RedHat = yum
+Ubuntu = apt
+python = pip
+
+- hosts: all
+  tasks:
+    - name: install pip
+      yum: name=pip state=present
+
+    - name: installing NumPy
+      pip: name=NumPy state=present
+
+    - name: installing Pandas
+      pip: name=Pandas state=present
+
+
+WEB SERVER (Presentation layer) : To show the application : httpd : 80 : /var/www/html --> Where we can store the frontend code.
+
+APP SERVER (Business/ logic layer) : To use the application : Tomcat : 8080 : tomcat/webapps --> Where we can store the frontend code + backend code.
+
+
+DEPLOYING THE FRONTEND CODE:
+----------------------------
+
+- hosts: all
+  tasks:
+    - name: installing git 
+      yum: name=git state=present
+
+    - name: installing httpd 
+      yum: name=httpd state=present
+
+    - name: starting httpd
+      service: name=httpd state=started
+
+    - name: deploying the frontend code.
+      git:
+        repo: "https://github.com/saibootla/netflix-clone.git"
+        dest: "/var/www/html"
+
+
+COMMENTS:
+---------
+--> In yaml syntax we have only single line comment we don't have multiline comments for it by default.
+
+DRY RUN (Don't Repeat Yourself):
+--------------------------------
+--> Ansible Dry Run or Ansible check mode feature is to validate your playbook before execution.
+--> If we execute the playbook with dry run it won't do any changes in the worker node.
+
+
+DAY-06 22/05/2024: 
+------------------
+
+
+PROJECT:
+--------
+--> Install jenkins on ansible server and Connect to dashboard.
+
+INTEGRATING ANSIBLE PLAYBOOK WITH JENKINS PIPELINE:
+---------------------------------------------------
+
+1. Install ansible plugin
+
+2. configure the ansible tool.
+
+manage jenkins --> tools --> ansible --> name: ansible & Path to ansible executables directory: /usr/bin --> Save.
+
+3. To integrate playbook with the pipeline go to the pipeline syntax and select ansible playbook. select this one and follow the below path,
+
+ansible playbook --> playbook file path in workspace: /etc/ansible/deploy-artifact.yml --> Inventory file path in workspace: /etc/ansible/hosts 
+--> SSH creds: give creds of ansible and worker nodes (such as user name: root password: sai123) --> Disable the SSH key check --> Generate script.
+
+vim tomcat.yml
+
+- hosts: all
+  tasks:
+    - name: download tomcat from dlcdn
+      get_url:
+        url: "https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.87/bin/apache-tomcat-9.0.87.tar.gz"
+        dest: "/root/"
+
+    - name: untar the apache file
+      command: tar -zxvf apache-tomcat-9.0.87.tar.gz
+
+
+    - name: rename the tomcat
+      command: mv apache-tomcat-9.0.87 tomcat
+      tags: abc
+
+    - name: install java
+      command: yum install java-1.8.0-openjdk -y
+
+    - name: setting the roles in tomcat-user.xml file
+      template:
+        src: tomcat-users.xml
+        dest: /root/tomcat/conf/tomcat-users.xml
+
+    - name: delete two lines in context.xml
+      template:
+        src: context.xml
+        dest: /root/tomcat/webapps/manager/META-INF/context.xml
+
+    - name: start the tomcat
+      shell: nohup /root/tomcat/bin/startup.sh
+
+pipeline {
+    agent any
+   
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git&#39;
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('nexus upload') {
+            steps {
+                echo "artifact is uploaded to nexus"
+            }
+        }
+        stage('deploy') {
+            steps {
+                ansiblePlaybook credentialsId: '959fbd45-dd0d-44d9-95e6-dc2c41c7c58e', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: '/etc/ansible/playbook.yml', vaultTmpPath: ''
+            }
+        }
+    }
+}
+
+
+cat deploy-artifact.yml
+
+- hosts: all
+  tasks:
+
+    - name: copying artifact to the tomcat
+      copy:
+        src: /var/lib/jenkins/workspace/pipeline/target/NETFLIX-1.2.2.war
+        dest: /root/tomcat/webapps
+     
+
+
+DAY-07 23/05/2024:
+------------------
+
+
+CREATING EC2 FROM ANIBLE PLAYBOOK:
+----------------------------------
+
+NOTE : --> If Ansible want to create an EC2 instance it need to have permission
+       --> So to allocate the permission for our ansible we need to create IAM user.
+
+
+IAM --> Create user --> name: ansible --> next --> Attach policies directly --> AministratorAccess --> next --> Create user
+
+Ansible --> Security credentials --> Create access key --> CLI --> checkbox --> create access key --> download .csv file
+
+
+COME TO ASNIBLE SERVER:
+-----------------------
+
+aws configure --> Giving ansible user permissions to server.
+
+AWS Access Key ID: ************
+AWS Secret Access Key: ************
+Default region name: us-east-1
+Default output format: table
+
+sudo pip install boto --> Need to intall before creating an EC2 instance.
+
+- hosts: localhost
+  tasks:
+    - name: creating EC2 instance
+      ec2:
+        region: "us-east-1"
+        count: 3
+        image: "ami-04ff98ccbfa41c9ad"
+        instance-type: "t2.micro"
+        instance-tags:
+          Name: "abc"
+
+
+HOW TO ADD PARAMETERS:
+----------------------
+
+--> Used to pass information for jobs.
+
+CHOICE PARAMETER : To pass single input at a time.
+
+STRING PARAMETER : To pass multiple inputs at a time.
+
+MULTILINE STRING : To pass multiple inputs on multiple lines at a time.
+
+FILE PARAMETER   : To pass the file as input.
+
+BOOL PARAMETER   : To pass input either yes or no.
+
+
+PATH TO SET PARAMETER : job --> This project is parameterized --> Name: server , Choices: dev, test --> Save.
+
+
+PIPELINE CODE:
+--------------
+
+pipeline {
+    agent any
+    
+    stages {
+        stage('checkout') {
+            steps {
+                git branch: '$branch', url: 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('Nexus') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'NETFLIX', classifier: '', file: 'target/NETFLIX-1.2.2.war', type: '.war']], credentialsId: 'f1071717-fb38-426b-aaaf-4d70d51d54f7', groupId: 'in.RAHAM', nexusUrl: '100.25.177.236:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'netflix', version: '1.2.2'
+            }
+        }
+        stage('Deploy') {
+            input {
+                message "parameter check done ?"
+                ok "yes"
+            }
+            steps {
+                ansiblePlaybook credentialsId: '8918f57a-5dbf-4be3-b7d5-f3a43d5315a4', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', limit: '$server', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+            }
+        }
+    }
+}
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

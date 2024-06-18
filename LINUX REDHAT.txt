@@ -1,0 +1,134 @@
+DAY-04 30/06/2024:
+------------------
+
+
+FILE SYSTEM HIERARCHY:
+----------------------
+/ 	:  This is the top level directory in the directory, whatever the files we will create it will store inside the / only.
+
+/root	:  This is the root user by default we will have the user.
+
+/home	:  All the normal user accounts will be stored here.
+
+/boot	:  It will store the bootable files, It will help you to reach the operating system.
+
+/etc	:  It will store the configuration files.
+
+/bin	:  It will store the normal user executable commands
+
+/sbin	:  It will store the root user executable commands 
+
+/usr	:  unique shareable resources, It will store the program files
+
+/opt	:  It will store the third party program files.
+
+/var/log:  var will store variable files, log will store login events.
+
+/run/media	:  It will contain real time data or files
+
+/dev	:  It will contain the device files
+
+/proc	:  It will contain the background processes like cpu ram.
+
+/mnt	:  it is a empty directory, to create mount point for any partition
+
+/lib	:  It will contain the library files 
+
+/tmp 	:  tmp contains temporary files
+
+/sys 	:  contains system related info
+
+/srv	:  contains services
+
+
+SYMBOLIC LINKS:
+---------------
+
+RHEL 7.0 introduced some symbolic links to access the resources very quickly.
+
+/bin   -->  /usr/bin
+/sbin  -->  /usr/sbin
+/lib   -->  /usr/lib
+/lib64 -->  /usr/lib64
+
+
+DAY-05 31/06/2024:
+------------------
+
+
+COMMANDS:
+---------
+su - root 	:  To switch as a root user
+exit or logout	:  To comeout from the root user
+pwd		:  It will show the present working directory, It will print absolute path.
+cal 		:  It will print current month calendar
+uname -a	:  It will print complete info about kernel version
+uname -r	:  It will print only the kernel version.
+echo		:  It used to print a message or value
+
+--> In linux we have 2 types of variables
+    1. Pre defined variables
+    2. User defined variables
+--> Pre defined variables are by default in capital
+
+echo $HOME 		:  It will print the home directory of the current user.
+echo $PATH		:  it will print the user path where it is located
+env 			:  It will print all the available env variables
+echo $0 or $BASH	:  It will print the shell
+echo $BASH_VERSION	:  It will print the bash version
+
+
+DAY-06 01/06/2024:
+------------------
+
+date			:  It will print the date and time 
+date --help		:  It will print all the commands on date
+clear or ctrl l		:  To clear the screen
+whoami			:  It will print login user name
+who am i		:  It will show the login user name and details.
+
+cat>file1		:  To create and adding the content 
+cat file1 		:  To read the content in the file
+cat>>file1		:  To adding or appending the content
+cat file1 file2 >> file3 :  To appending file1 and file2 content to the file3 
+
+touch --> create file stamps
+
+touch f1 f2 f3 f4			:  To create files 
+touch f{1..4}				:  To create multiple files at a time
+touch -d "yyyy-mm-dd hh-mm-ss" 	file1 	:  To create timestamp of the file
+
+mkdir dir1				:  To create single directory
+mkdir dir1 dir2 dir3			:  To create multiple directories
+mkdir dir{1..4}				:  To create multiple directories at a time 
+mkdir -p l1/l2/l3/l4			:  To create parent and child directories (-p stands for parenting directory)
+
+mkdir -p NIT/{Linux/{Rhcse, Rhce},Windows/{Mcse, Mcsa},Oracle/{sql,plsql}} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

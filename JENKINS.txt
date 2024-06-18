@@ -1,0 +1,913 @@
+DAY-01 03/05/2024:
+------------------
+
+Jenkins is a CI/CD Tool.
+Reality : Jenkins is only for CI.
+
+CI : CONTINOUS INTEGRATION : CONTINOUS BUILD + CONTINOUS TEST (OLD CODE WITH NEW CODE)
+
+DAY-1: 100 LINES : BUILD + TEST
+DAY-2: 200 LINES : BUILD + TEST
+DAY-3: 300 LINES : BUILD + TEST
+
+BEFORE CI:
+----------
+MANUAL PROCESS
+TIME WASTE
+
+AFTER CI:
+---------
+AUTOMATED PROCESS
+TIME SAVING
+
+CD: CONTINOUS DELIVERY/DEPLOYMENT
+
+ENV:
+
+PRE-PROD/NON-PROD:
+DEV	: developers
+QA	: testers
+UAT	: clients
+
+LIVE/PROD ENV:
+PROD	: users
+
+
+CONTINOUS DELIVERY 	: Deploying the application to producion in manual.
+CONTINOUS DEPLOYMENT	: Deploying the application to producion in automatic.
+
+
+PIPELINE:
+---------
+WAKEUP -- > DAILY ACTIVITIES -- > BREAKFAST -- > LUNCH -- > CLASS
+CODE -- > COMPILE -- > TEST -- > ARTIFACT -- > DEPLOY
+
+--> STEP BY STEP EXECUTION OF A PROCESS.
+--> SERIES OF EVENTS INTERLINKED WITH EACHOTHER.
+
+
+JENKINS:
+--------
+
+--> ITS A FREE AND OPEN-SOURCE TOOL.
+--> JENKINS WRITTEN ON JAVA.
+--> IT IS PLATFORM INDEPENDENT.
+--> IT CONSIST OF PLUGINS.
+--> WE HAVE COMMUNITY SUPPORT.
+--> IT CAN AUTOMATE ENTIRE SDLC.
+--> IT IS OWNED BY SUN MICRO SYSTEM AS HUDSON.
+--> HUDSON IS PAID VERSION.
+--> LATER ORACLE BROUGHT HUDSON AND MAKE IT FREE.
+--> LATER HUDSON WAS RENAMED AS JENINS.
+--> INVENTOR: Kohsuke Kawaguchi
+--> PORT NUMBER: 8080
+--> JAVA: JAVA-11/17
+--> DEFAULT PATH: /var/lib/jenkins
+
+ALTERNATIVES:
+-------------
+BAMBOO, GO CI, CIRCLE CI, TARVIS, SEMAPHORE, BUDDY BUILD MASTER, GITLAB, HARNESS
+ARGOCD -----
+
+CLOUD: AWS CODEPIPELINE, AZURE PIPLEINE ---------------------
+
+
+
+SETUP: 
+------
+--> Create an EC2 and Include all traffic in security group.
+
+#STEP-1: INSTALLING GIT JAVA-1.8.0 MAVEN:
+-----------------------------------------
+yum install git java-1.8.0-openjdk maven -y
+
+#STEP-2: GETTING THE REPO (jenkins.io --> download -- > redhat):
+----------------------------------------------------------------
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+#STEP-3: DOWNLOAD JAVA11 AND JENKINS:
+-------------------------------------
+amazon-linux-extras install java-openjdk11 -y
+yum install jenkins -y
+update-alternatives --config java --> used to change one java version to another java version.
+
+#STEP-4: RESTARTING JENKINS (when we download service it will on stopped state):
+--------------------------------------------------------------------------------
+systemctl start jenkins.service
+systemctl status jenkins.service
+
+CONNECT:
+--------
+copy-public-ip:8080 (browser)
+cat /var/lib/jenkins/secrets/initialAdminPassword (server)
+paste password on browser -- > installing plugins --- > user details -- > start
+
+
+JOB: 
+----
+--> It is used to perform task.
+--> To do any work or task in jenkins we need to create a job.
+--> To run commands we need to select execute shell on build steps.
+
+Build now : To run job
+Workspace : Place where our job outputs will store.
+
+CREATING A JOB:
+---------------
+New Item -- > Name : ABC -- > Freestyle -- > Ok -- > SCM -- > Git -- > Repo URL : https://github.com/devopsbyraham/jenkins-java-project.git -- >Build Steps -- > Add Build Steps -- > Execute shell -- > mvn clean package -- > save -- > build now
+
+WORKSPACE:
+----------
+--> Where your job output is going to be stored
+
+Default : /var/lib/jenkins/workspace
+
+
+DAY-02 04/05/2024:
+------------------
+
+
+SETTING CI SERVER USING SCRIPT:
+-------------------------------
+
+Create a server
+sudo -i 
+
+vim jenkins.sh
+
+#STEP-1: INSTALLING GIT JAVA-1.8.0 MAVEN 
+yum install git java-1.8.0-openjdk maven -y
+
+#STEP-2: GETTING THE REPO (jenkins.io --> download -- > redhat)
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+#STEP-3: DOWNLOAD JAVA11 AND JENKINS
+amazon-linux-extras install java-openjdk11 -y
+yum install jenkins -y
+update-alternatives --config java
+
+#STEP-4: RESTARTING JENKINS (when we download service it will on stopped state)
+systemctl start jenkins.service
+systemctl status jenkins.service
+
+:wq
+
+To run script : sh jenkins.sh
+
+--> To execute commands on jenkins use execute shell under build steps.
+
+VARIABLES:
+-----------
+--> It is used to store values that are going to change frequently.
+ex: date, season -----
+
+TYPES OF VARIABLES IN JENKINS:
+------------------------------
+1. USER DEFINED
+2. JENKINS ENV
+
+1. USER DEFINED VARIABLES: 
+--------------------------
+--> These are defined by the user.
+
+a. Local Variable: 
+------------------
+--> Variable will work inside of job.
+--> Will be working for only single job.
+
+NEW ITEM -- > NAME: ABC -- > FREESTYLE -- > OK -- > BUILD -- >EXECUTE SHELL
+
+Ex : name=raham
+     echo "hai all my name is $name, $name is from hyderabad, $name is teaching devops"
+
+
+b. Global Variable: 
+-------------------
+--> Variable will work outside of job.
+--> Will be working for multiple jobs.
+
+Dashboard -- > Manage Jenkins -- > System -- > Global properties  -- > Environment variables -- > add : Name: name value: raham -- > save 
+
+NOTE: while defining variables spaces will not be given.
+local variables will be high priority.
+
+Limitation: some values cant be defined by user because these values will change build by build.
+ex: build number, time, name, url -----
+
+
+2. JENKINS ENV VARIABLES:
+-------------------------
+--> These are defined by Jenkins itself.
+a. these variables can be change from build to build.
+b. these variables will be on upper case.
+c. these variables can be defined only once.
+
+echo "the build number is $BUILD_NUMBER, the job name is $JOB_NAME"
+
+printenv : Gives all env vars of jenkins
+
+
+ADMIN TASKS:
+------------
+1. CHANGING PORT NUMBER OF JENKINS:
+-----------------------------------
+find / -name jenkins.service
+find command used to find the path of a file.
+
+--> All the services have configuration file.
+
+find / -name jenkins.service
+vim /usr/lib/systemd/system/jenkins.service
+line-70: 8080=8090 -- > save and exit
+systemctl daemon-reload 
+systemctl restart jenkins.service
+
+--> When we chnage configuration of any service we need to restart.
+
+2. PASSWORDLESS LOGIN:
+----------------------
+find / -name config.xml
+vim /var/lib/jenkins/config.xml
+line-10: true=false
+systemctl restart jenkins.service
+
+now check the jenkins dashboard it won't ask password.
+
+
+3. HOW TO RESOLVE THE ISSUE IF JENKINS SERVER CRASHED ?
+-------------------------------------------------------
+--> Stop the jenkins server and start it 
+systemctl restart jenkins.service
+
+--> When we stop server the services will be also stopped, so we want to restart them.
+--> When we stop and start the server Public ip will change and also we need to restart the jenkins service.
+
+systemctl stop jenkins.service
+systemctl restart Jenkins.service
+
+
+BUILD EXECUTORS & PARALLEL BUILDS:
+----------------------------------
+--> Jenkins will run the jobs sequentially (one by one)
+--> If i want to run multiple builds at same time we can configure like this
+
+job -- > configure -- > Execute concurrent builds if necessary -- > save -- > build now 2 times
+now we can see 2 jobs will be running on same time.
+
+BUILD EXECUTORS: 
+----------------
+--> Max number of builds we can run
+
+Build-executor status -- > Built-In Node -- > Configure -- > 2 - 5 -- > Save
+now build 5 times
+
+
+
+DAY-03 06/05/2024:
+------------------
+
+
+CRON JOB:
+---------
+--> We can schedule the jobs that need to be run at particular intervals.
+--> Here we use cron syntax
+
+cron syntax has * * * * *
+each * is separated by space
+
+*	: minutes
+*	: hours
+*	: date
+*	: month
+*	: day of week (sun=0, mon=1 ----)
+
+Ex : 6:20 06-may-2024
+
+20 18 6 5 1 
+
+create a ci job -- > Build Triggers -- > Build periodically -- > * * * * * -- > save
+
+CRONTAB-GENERATOR: https://crontab-generator.org/
+
+LIMITATION:
+----------- 
+--> It will not check the code is changed or not.
+
+
+POLL SCM:
+--------- 
+--> In pollscm we will set time limit for the jobs.
+--> If dev commit the code it will wait until the time is done.
+--> In given time if we have any changes on code it will generate a build
+
+create a ci job -- > Build Triggers -- > poll scm -- > * * * * * -- > save
+commit the changes in GitHub then wait for 1 min.
+
+LIMITATION:
+-----------
+1. in pollscm, we need to wait for the time we set.
+2. we will get the last commit only.
+
+
+WEBHOOK: 
+--------
+--> It will trigger build the moment we change the code. Here we need not to wait for the build.
+
+Repo -- > Settings -- > Webhooks -- > Add webhook -- > Payload URL (jenkins url) -- > http://35.180.46.134:8080/github-webhook/  -- > Content type -- > application/json -- > Add
+
+create ci job -- > Build Triggers: GitHub hook trigger for GITScm polling -- > save
+
+
+BUILD SCRIPTS:
+--------------
+--> To make jenkins builds from remote loc using script/
+give token 
+give url on other browser.
+
+
+THROTTLE BUILD:
+---------------
+
+--> To restrict the builds in a certain time or intervals.
+--> If we dont rsetrict due to immediate builds jenkins might crashdown.
+--> By default jenkins will not do concurrent builds.
+--> We need to enable this option in configuration.
+
+Execute concurrent builds if necessary -- > tick it
+
+create a ci job -- > configure -- > Throttle builds -- > Number of builds: 3 -- > time period : hours -- > save
+
+now it will take 20  mins of gap for each build.
+
+
+
+DAY-04 08/05/2024:
+------------------
+
+
+NOTE:
+-----
+--> If we stop server then services inside server also going to stop.
+
+chkconfig jenkins on
+
+the above command will restart the jenkins service all the time.
+
+PIPELINE:
+---------
+--> Step by step execution of a process (or) Series of events interlinked with each other.
+
+code -- > build -- > test -- > artifact -- > deployment
+
+WHY TO USE ?:
+-------------
+--> To automate the work.
+--> To have clarity about the stage.
+
+TYPES:
+------
+1. DECLARATIVE
+2. SCRIPTED
+
+PIPELINE SYNTAX:
+----------------
+--> To write the pipeline we use Domain Specific Language (DSL).
+--> We use Groovy Script for jenkins Pipeline.
+--> It consists of blocks that include stages.
+--> It includes () & {} braces.
+
+SHORTCUT: PASSS
+
+P	: pipeline
+A	: agent
+S	: stages
+S	: stage
+S	: steps 
+
+
+SINGLE STAGE: 
+-------------
+--> This pipeline will have only one stage.
+
+EX-1:
+pipeline {
+    agent any 
+    
+    stages {
+        stage('abc') {
+            steps {
+               sh 'touch file1'
+            }
+        }
+    }
+}
+
+EX-2:
+pipeline {
+    agent any 
+    
+    stages {
+        stage('raham') {
+            steps {
+                sh 'touch file2'
+            }
+        }
+    }
+}
+
+MULTI STAGE: 
+------------
+--> This pipeline will have more than one stage.
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('two') {
+            steps {
+                sh 'lsblk'
+            }
+        }
+        stage ('three') {
+            steps {
+                sh 'lscpu'
+            }
+        }
+        stage ('four') {
+            steps {
+                sh 'lsmem'
+            }
+        }
+    }
+}
+
+
+CI PIPELINE:
+------------
+
+--> Code + Build + Test + Artifact
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('checkout') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage ('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage ('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+
+PIPELINE AS A CODE:
+-------------------
+--> Running more than one command/action inside a single stage.
+--> To reduce the length of the code.
+--> To save the time.
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('checkout') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+                sh 'mvn compile'
+                sh 'mvn test'
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+
+MULTI STAGE PIPELINE AS A CODE:
+-------------------------------
+--> Running more than one command/action in multiple stages.
+
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('one') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+                sh 'mvn compile'
+            }
+        }
+        stage ('two') {
+            steps {
+                sh 'mvn test'
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+
+PAAC OVER SINGLE SHELL:
+-----------------------
+--> Running all the shell commands on a single shell.
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('one') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+                sh '''
+                mvn compile
+                mvn test
+                mvn package
+                '''
+            }
+        }
+    }
+}
+
+
+INPUT PARAMETERS:
+-----------------
+--> Based on user input job is going to be execute.
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('checkout') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage ('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage ('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage ('deploy') {
+            input {
+                message "is your inputs correct ?"
+                ok "yes"
+            }
+            steps {
+                echo "my code is deployed"
+            }
+        }
+    }
+}
+
+
+NOTE: if we have syntax issue none of the stages will execute.
+
+DIFF BLW SCRIPTED VS DECLARATVE:
+--------------------------------
+SCRIPTED: 	DECLARATIVE: 
+----------------------------
+Short		Long
+No Stages       It has stages
+Start Node      Start with pipeline
+
+
+DAY-05  09/05/2024:
+-------------------
+
+
+MASTER AND SLAVE:
+-----------------
+--> It is used to distribute the builds.
+--> It reduce the work load on jenkins.
+--> Communication b/w the Master and Slave is SSH.
+--> Here we need to install agent (Java-11) on worker nodes.
+--> If we don't install java-11 on worker nodes the master node will not communicate with the worker nodes.
+--> Slave can use any platform.
+--> label : Way of assigning work for slave.
+
+SETUP:
+------
+
+#STEP-1 : Create a server and install java-11.
+amazon-linux-extras install java-openjdk11 -y
+
+#STEP-2 : Setup the Slave server.
+Dashboard --> Manage jenkins --> Nodes & Clouds --> New node --> Node name : slave1 --> permanent agent --> Save.
+
+
+CONFIGURATION OF SLAVE:
+-----------------------
+Number of Executors 	: 2 #Number of parallel builds.
+Remote root directory 	: /tmp #The place our output is stored on slave server.
+Lables 			: slave1 #give a unique name as lable 
+Usage			: Last option.
+Host			: Your private ip address.
+Credentials		: Add --> Jenkins --> Kind : SSH user name with private key --> User name : ec2-user.
+Private key 		: pem file of server --> Save --> Host key verification strategy : last option.
+
+Dashboard --> Job --> Configure --> Restrict the where this job run --> Label : slave1 --> Save.
+
+Build fails --> Why ? --> We need to install the packages.
+yum install git java-1.8.0-openjdk maven -y
+
+
+Ex: Pipeline with slave server:
+------------------------------- 
+
+pipeline {
+    agent {
+        label 'slave1'
+    }
+    
+    stages {
+        stage('code') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+
+
+DAY-06  10/05/2024:
+-------------------
+
+
+NEXUS:
+------
+--> It is an artifactory storage service.
+--> Used to store artifacts on Repo. (.jar, .war, .ear).
+
+Nexus server --> Repo --> Artifact
+
+--> We can use this server to rollback in real time.
+--> It requires t2.medium
+--> Nexus uses java-1.8.0 --> yum install java-1.8.0-openjdk -y
+--> Port Number : 8081.
+
+ALTERNATIVES : JFROG, S3, etc.,
+
+SETUP SCRIPT:
+-------------
+https://github.com/saibootla/all-setups.git
+
+
+STEPS:
+------
+--> After running and starting the application, In nexus
+
+Sign in --> username : admin & password : /app/sonatype-work/nexus3/admin.password --> Next --> Set password --> Disable anonymous access --> Save.
+
+
+CREATING REPO IN NEXUS:
+-----------------------
+Go to Settings symbol --> Repositories --> New --> Maven2(hosted) --> name --> Save.
+
+
+NOTE : To integrate any tool with jenkins we need to download the plugins.
+
+
+NEXUS INTEGRATION TO PIPELINE:
+------------------------------
+--> Download the plugins (Nexus Artifact Uploader).
+
+Manage jenkins --> plugins --> Available plugins --> Nexus Artifact Uploader --> Install.
+
+--> Configure it to pipeline by using pipeline syntax.
+
+--> In the drop down select --> nexusArtifactUploader.
+
+NOTE : All the information will be available on POM.XML file
+
+
+PIPELINE:
+---------
+
+pipeline {
+    agent any
+    
+    stages {
+        stage ('code') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage ('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage ('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+	stage ('artifact upload') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'NETFLIX', classifier: '', file: 'target/NETFLIX-1.2.2.war', type: '.war']], credentialsId: '968c23dd-b648-4f15-91bf-7d76981a1218', groupId: 'in.RAHAM', nexusUrl: '100.25.197.110:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'netflix', version: '1.2.2'
+            }
+        }
+    }
+}
+
+
+TOMCAT:
+-------
+
+Website 	: Frontend --> DB is optional
+Web Application : Frontend + Backend --> DB is mandatory
+
+--> Tomcat is a web application server used to deploy java applications.
+--> Agent : Java-11
+--> Port : 8080
+
+--> We can deploy our artifacts.
+--> Its free and open source.
+--> It is written on java language.
+--> Came on the year : 1999
+
+.war	: war file we need to deploy on  --> tomcat/webapps --> frontend + backend 
+.jar	: jar file we need to deploy on  --> tomcat/lib --> backend 
+Frontend code --> httpd --> /var/www/html
+
+ALTERNATIVES : NGINX, IIS, WEBSPHERE, JBOSS, GLASSFISH, etc.,
+
+
+SETUP:
+------
+--> Create an EC2 instance, and install java-11.
+
+amazon-linux-extras install java-openjdk11 -y
+
+STEP-1 : Download Tomcat (dlcdn.apache.org).
+--------------------------------------------
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.87/bin/apache-tomcat-9.0.89.tar.gz
+
+
+STEP-2 : Extract the files.
+---------------------------
+tar -zxvf apache-tomcat-9.0.89.tar.gz
+
+
+STEP-3 : Configure User, Password & Roles.
+------------------------------------------
+vim apache-tomcat-9.0.89/conf/tomcat-users.xml
+
+ 56   <role rolename="manager-gui"/>
+ 57   <role rolename="manager-script"/>
+ 58   <user username="tomcat" password="raham123" roles="manager-gui, manager-script"/>
+
+
+STEP-4 : Delete Line 21 and 22 
+------------------------------
+find / -name context.xml
+vim apache-tomcat-9.0.89/webapps/manager/META-INF/context.xml
+
+
+STEP-5 : Starting tomcat.
+-------------------------
+find / -name startup.sh
+sh apache-tomcat-9.0.89/bin/startup.sh
+
+
+CONNECTING TO THE TOMCAT:
+-------------------------
+--> Copy the Public IP : 8080
+
+Manage apps --> username : tomcat & password : saikrishna123
+
+
+
+DAY-07  11/05/2024:
+-------------------
+
+
+ROLE BASED ACCESS CONTROL:
+--------------------------
+--> To restrict the user permissions in Jenkins.
+
+Ex : Suresh: fresher , Saikrishna : Exp
+
+
+STEP-1 : User Creation:
+-----------------------
+Manage jenkins -- > Users -- > Create users -- > suresh: fresher 
+
+
+STEP-2 : Downloading Plugin:
+----------------------------
+Dashboard --> Manage Jenkins --> Plugins --> Available plugin --> Role-based Authorization Strategy 
+
+
+STEP-3 : Configure the Plugin:
+------------------------------
+Dashboard --> Manage Jenkins --> Security --> Authorization --> Role-based Strategy --> Save
+
+
+STEP-4 : Manage and assign users:
+---------------------------------
+Manage roles -- > Add -- > fresher & exp -- > fresher: overall read & exp: admin -- > save
+assign roles -- > add user -- > rajesh: fresher -- > save
+
+
+LINKEDJOB:
+----------
+--> One job is build when other job is build. 
+
+Upstream 
+Downstream
+
+job --> configure --> goto build triggers --> Advanced section --> build after the job --> Save  
+
+
+CUSTOM WORKSPACE:
+-----------------
+--> By default in jenkins the job output will be stored on var/lib/jenkins/workspace.
+
+--> In real time we need to store output on our own custom workspace.
+
+job --> Advanced section --> Use custom workspace.
+
+--> In jenkins we don't have permission to store output on our own workspace, we need to change the ownership to jenkins.
+
+Command : cd / --> / is the root directory
+	  chown jenkins:jenkins /root
+          chown jenkins:jenkins root/raham/
+
+--> When you click build now, Automatically the output will be stored on raham folder.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

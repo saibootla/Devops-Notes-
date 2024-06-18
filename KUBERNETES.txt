@@ -1,0 +1,1019 @@
+DAY-01 31/05/2024:
+------------------
+
+KUBERNETES (OR) K8S:
+--------------------
+
+LIMITATIONS OF DOCKER SWARM:
+----------------------------
+--> Can't do Auto-Scaling automatically.
+--> Can't do load balancing automatically.
+--> Can't have default dashboard.
+--> We can't place container on required server.
+--> Used for easy applications.
+
+
+HISTORY OF K8S:
+---------------
+--> initially google created an internal system called Borg (later called as omega) to manage it's thousand of applications.
+--> Later they donated the Borg system to CNCF (Cloud Native Computing Foundation) and they make it as open source.
+--> Initial name is Borg but later CNCF rename it to Kubernetes.
+--> The word Kubernetes is originated from Greek word called pilot or Hailsmen.
+--> Borg : 2014
+--> K8S first version came in the year 2015.
+
+
+K8S INTRO:
+----------
+--> It is an open source container orchestration platform.
+--> It is used to automates many of the manual processes like deploying, managing and scaling containerized applications.
+--> Kubernetes developed by Google using GO language.
+
+Mem --> Google --> Cluster --> Multiple apps of google --> Borg
+
+--> Google donated Borg to CNCF in 2014.
+--> 1st version was released in 2015.
+
+
+K8S ARCHITECTURE:
+-----------------
+
+DOCKER --> CNCA
+K8S    --> CNPCA
+
+C : Cluster
+N : Nodes
+P : Pods
+C : Container
+A : Application
+
+
+COMPONENTS:
+-----------
+MASTER:
+-------
+
+1. API SERVER	:  Communicate with the user (takes commands and execute gives o/p to the user).
+
+2. ETCD		:  Database of the cluster (stores complete info of a cluster on Key-Value pair).
+
+3. SCHEDULAR	:  Select the worker node to schedule pods (depends on hardware of node)
+
+4. CONTROLLER	:  Control the K8S objects (n/w, service, node).
+
+
+WORKER:
+-------
+
+1. KUBELET	:  It's an agent (Whatever the events will happen in worker nodes, it will intimate to the master node).
+
+2. KUBEPROXY	:  It deals with n/w (ip, network, ports).
+
+3. POD 		:  group of containers (inside the pod we have app or container).
+
+NOTE  :  All components of a cluster will be created like as a pod.
+
+
+CLUSTER TYPES:
+--------------
+
+1. SELF MANAGED:
+----------------
+--> We need to create and manage them.
+
+minicube  -->  single node cluster. --> master and worker node on single machine.
+kubeadm	  -->  multi node cluster (manual).
+KOps      -->  multi node cluster (automation).
+
+
+2. CLOUD BASED:
+---------------
+--> cloud providers will manage them.
+
+AWS    -->  EKS  -->  Elastic Kubernetes Service
+AZURE  -->  AKS  -->  Azure Kubernetes Service
+GOOGLE -->  GKS  -->  Google Kubernetes Service
+
+
+MINIKUBE:
+---------
+--> It is a tool used to setup single node cluster on K8S.
+--> It contains API Servers, ETCD Data base, and container runtime.
+--> It is used for developing, testing, and experimentation purposes on local system.
+--> Here, Master and Worker runs on same machine.
+--> It is a platform independent.
+--> Installing a Minikube is simple compared to other tools.
+
+NOTE  :  We don't implement this on real-time prod.
+
+
+REQUIREMENTS:
+-------------
+2 CPUS or more  -->  t2.medium
+2GB of free memory
+20GB of free disk space
+Internet connection
+Container or virtual machine manager such as : Docker.
+
+--> kubectl is the command line tool for K8S
+--> If we want to execute commands we need to use kubectl
+
+
+SETUP:
+------
+vim minikube.sh  --> Take the script from the github (all-setups)
+sh minikube.sh   --> To run the script
+
+
+POD:
+----
+--> It is a smallest unit of deployment in K8S.
+--> It is a group of containers.
+--> Pods are ephemeral (short living objects).
+--> Mostly we can use single container inside a pod, but if we required we can create multiple containers on same pod.
+--> When we create a pod, containers inside the pod can share the same n/w namespace and same storage volumes.
+--> While creating the pod we must specify the image, along with any necessary configuration and resource limits.
+--> K8S cannot communicate with the containers, they can communicate with only pods.
+--> We can create pod in two ways.
+
+1. Imperative (command)
+2. Declarative (Manifest file)
+
+
+IMPERATIVE:
+-----------
+
+kubectl run pod1 --image saibootla/moviesrepo:latest  -->  To create pod
+
+kubectl get pods/pod/po  -->  To list the pods
+
+kubectl get pod -o wide  -->  To get the IP address of the pod
+
+kubectl describe pod pod1  -->  To get complete information about the pod.
+
+kubectl delete pod pod1  -->  To delete the pod 
+
+
+DECLARATIVE:
+------------
+
+--> By using file called manifest file.
+
+MANDATORY FIELDS   :   Without these fields we can't create manifest.
+
+apiVersion:
+kind:
+metadata:
+spec:
+
+vim pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+    - image: saibootla/moviesrepo:latest
+      name: cont1
+
+EXECUTION:
+----------
+
+kubectl create -f pod.yml
+kubectl get pods/pod/po
+kubectl get pod -o wide
+kubectl describe pod pod1
+kubectl delete pod pod.yml
+
+DRAWBACK  :  once a pod is deleted we can't retrieve the pod.
+
+
+
+DAY-02 03/06/2024:
+------------------
+
+
+REPLICASET:
+-----------                                                                 
+replicaset --> copies
+rs  -->  pods 
+
+--> It will create multiple copies of the same pod.
+--> If we delete one pod automatically it will create new pod.
+--> All the pods will have the same configuration.
+--> Only pod names will be different.
+
+
+LABELS:
+-------
+--> Individual pods are difficult to manage because they have different names.
+--> So we will give a common label to group them and work with them together.
+
+SELECTOR  :  Used to select pods with the same labels
+
+--> Use kubectl api-resources for checking the objects info.
+
+
+PROCESS:
+--------
+vim replicaset.yml
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata: 
+      labels:
+        app: movies
+    spec:
+      containers:
+        - name: cont1
+          image: saibootla/moviesrepo:latest
+
+COMMANDS:
+---------
+kubectl create -f replicaset.yml	:  To create the replicaset
+
+kubectl get rs/replicaset		:  To list the rs
+
+kubectl get rs -o wide			:  To show additional info 
+
+kubectl describe rs name_of_rs		:  To get the complete info 
+
+kubectl delete rs name_of_rs		:  To delete the rs
+
+kubectl get pods -l app=paytm		:  To get labels of pods 
+
+kubectl scale rs/movies --replicas=10 	:  To scale the rs
+
+NOTE  :  --> When you perform scale down it will follows the LIFO (Last In First Out) pattern.
+         --> If a pod is created lastly it will delete first when scale out.
+
+NOTE  :  --> When you delete the replicaset name called movies, the containers will also gone.
+
+ADVANTAGES:
+-----------
+--> Self healing 
+--> Scaling
+
+DRAWBACKS:
+----------
+--> We can't rollin and rollout, we can't the update the application in rs.
+
+
+DEPLOYMENT:
+-----------
+deploy  -->  rs  -->  pods 
+
+--> We can update the application.
+--> It's high level K8S object.
+
+vim deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: paytm
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      labels: paytm
+  template:
+    metadata:
+      labels:
+        app: paytm
+    spec:
+      containers:
+        - name: cont1
+          image: saibootla/moviesrepo:latest 
+
+COMMANDS:
+---------
+kubectl create -f deploy.yml			:  To create the Deployment
+
+kubectl get deploy				:  To list the deployment
+
+kubectl get deploy -o wide			:  To get additional information 
+
+kubectl describe deploy name_of_deployment	:  To get complete information 
+
+kubectl delete deploy name_of_deployment	:  To delete the deploy
+
+kubectl get pods -l app=paytm			:  To get labels of the pods.
+
+kubectl scale deploy/movies --replicas=10	:  To scale the deploy
+
+kubectl edit deploy/name_of_deploy		:  To edit deploy
+
+kubectl get pods --show-labels			:  To show all pod labels
+
+kubectl delete pod -all 			:  To delete all pods 
+
+NOTE  :  When we scale down it will follows the Last In First Out (LIFO) pattern.
+
+NOTE  :  When you delete the deployment name called movies, the containers will also gone.
+
+
+ROLLOUT COMMANDS:
+-----------------
+kubectl rollout history deploy/name_of_deploy	:  It will gives the history of the modifications we have done.
+
+kubectl rollout undo deploy/name_of_deploy	:  It will take you to the previous deployments
+
+kubectl rollout status deploy/name_of_deploy	:  To check the rollout status 
+
+kubectl rollout pause deploy/name_of_deploy	:  If we give this we can't able to go previous deployments 
+
+kubectl rollout resume deploy/name_of_deploy	:  To resume the rollout
+
+
+
+DAY-03 04/06/2024:
+------------------
+
+
+
+KOPS:
+-----
+INFRASTRUCTURE   :   Resources used to run our application on cloud.
+
+Ex : EC2, VPC, ALB(Application Load Balancer), ASG(Auto Scaling Group), ----
+
+
+MINIKUBE   :   Single node cluster
+
+--> All the pods are in single node 
+--> If that node got deleted then all pods will be gone.
+
+
+KOPS:
+-----
+--> KOps is also knowm as Kubernetes Operations.
+--> It is an open source tool that helps you create, destroy, upgrade and maintain a highly available production-grade Kubernetes cluster.
+--> Depending on the requirement KOps can also provide cloud infrastructure.
+--> KOps is mostly used in deploying AWS and GCE Kubernetes clusters 
+--> But officially, the tool only supports AWS.
+--> Support for other cloud providers (such as DigitalOcean, GCP, and Openstack) are in the beta stage.
+
+ADVANTAGES:
+-----------
+--> Automates the provisioning of AWS and GCE Kubernetes clusters 
+--> Deploys highly available kubernetes masters
+--> Supports rolling cluster updates.
+--> Autocompletion of commands in the command line.
+--> Generates Terraform and cloudFormation configurations.
+--> Manages cluster add-ons.
+--> Supports state sync model for dry run and automatic idempotency
+--> Creates instance groups to support heterogeneous clusters.
+
+ALTERNATIVES  :  Terraform, MiniKube, Kubeadm, Rancher, Amazon EKS
+
+
+SETUP:
+------
+STEP-1 : GIVING PERMISSIONS:  
+----------------------------
+--> KOps is a third party tool if it want to create infrastructure on AWS, AWS need to give permission for it.
+--> So we can use IAM User to allocate the permission for the KOps tool.
+
+IAM --> User --> Create user --> Name : KOps --> Attach policies directly --> AdminstratorAccess --> Create user -->
+User --> Security credentials --> Create access keys --> CLI --> Checkbox --> Create access keys --> Download 
+
+aws configure (run this command on server)
+
+
+STEP-2 : INSTALL KUBECTL AND KOPS:
+----------------------------------
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+wget https://github.com/kubernetes/kops/releases/download/v1.25.0/kops-linux-amd64
+chmod +x kops-linux-amd64 kubectl
+mv kubectl /usr/local/bin/kubectl
+mv kops-linux-amd64 /usr/local/bin/kops
+
+NOTE  :  --> I have downloaded this binary packages in ubuntu, but when im trying to run kubectl and kops commands in amazon-linux it won't work.
+         --> Because amazon linux AMI will confuse from where these user commands coming from so we need to run this commands then it will work.
+
+vim .bashrc
+export PATH=$PATH:/usr/local/bin/   -->   Save it and exit
+source .bashrc
+
+
+STEP-3 : CREATING BUCKET:
+-------------------------
+--> Bucker is nothing but a storage object, we need to store the data inside the bucket.
+--> The purpose of creating bucket is to exporting the cluster data in to bucket.
+--> If incase cluster got deleted, the cluster data will be available on bucket, i can get it from there.
+
+aws s3api create-bucket --bucket saikrishnabootla.k8s.local --region us-east-1
+aws s3api put-bucket-versioning --bucket saikrishnabootla.k8s.local --region us-east-1 --versioning-configuration Status=Enabled
+export KOPS_STATE_STORE=s3://devopsbatchapr600pm.k8s.local
+
+--> Bucket versioning is nothing but, if any case the data inside the bucket got deleted still we can retrive it by using bucket versioning.
+
+
+STEP-4 : CREATING CLUSTER:
+--------------------------
+kops create cluster --name rahams.k8s.local --zones us-east-1a --master-count=1 --master-size t2.medium --node-count=2 --node-size t2.micro
+
+kops update cluster --name rahams.k8s.local --yes --admin
+
+
+SUGGESTIONS:
+------------
+kops get cluster					:  List clusters
+
+kops edit cluster rahams.k8s.local			:  Edit this cluster 
+
+kops edit ig --name=rahams.k8s.local nodes-us-east-1a	:  Edit your node instance group
+
+kops edit ig --name=rahams.k8s.local master-us-east-1a	:  Edit your master instance group
+
+NOTE  :  In manager node we can't create the pods, only worker nodes we can create.
+
+NOTE  :  Don't delete the cluster manually and do not delete any server use the below command to delete the cluster.
+
+Command  :  kops delete cluster --name rahams.k8s.local --yes
+
+
+DAY-04 05/06/2024:
+------------------
+
+
+ADMIN ACTIVITIES FOR NODES:
+---------------------------
+To scale the worker nodes follow these steps:
+
+kops edit ig --name=rahams.k8s.local nodes-us-east-1a
+
+kops update cluster --name rahams.k8s.local --yes --admin
+
+kops rolling-update cluster
+
+NOTE  :  In real time we use five node cluster two master nodes and three worker nodes.
+
+
+ADMIN ACTIVITIES FOR MASTER:
+----------------------------
+kops edit ig --name=rahams.k8s.local master-us-east-1a
+
+kops update cluster --name rahams.k8s.local --yes --admin
+
+kops rolling-update cluster
+
+
+NAMESPACES:
+-----------
+--> It is used to divide the cluster to multiple teams on real time.
+--> It is used to isolate the env.
+
+Cluster    -->  House 
+Namespaces -->  Room
+
+--> Each namespace is isolated.
+--> If your are in room1 are you able to see room2.
+--> If a dev create a pod on dev ns testing team can't able to access it.
+--> We can't access the objects from one namespace to another namespace.
+
+
+TYPES:
+------
+default 	  :  It is the default namespace, all objects will create here only
+kube-node-lease	  :  It will store object which is taken from one namespace to another.
+kube-public	  :  All the public objects are store here.
+kube-system	  :  By default k8s will create some objects, those are storing on this ns.
+
+NOTE  : --> Every component of Kubernetes cluster is going to create in the form of pod.
+        --> And all these pods are going to store on kube-system ns.
+
+kubectl get pod -n kube-system		:  To list all the pods in the kube-system namespace.
+
+kubectl get pod -n default		:  To list all pods on default namespace.
+
+kubectl get pod -n kube-public		:  To list all pods on kube-public namepace
+
+kubectl get pod -A			:  To list all pods in all namespaces. (kubectl get pod --all-namespaces)
+
+
+COMMANDS:
+---------
+kubectl create ns dev			:  To create namespace
+
+kubectl config set-context --current --namespace=dev	:  To switch to the namespace
+
+kubectl config view | grep namespace	:  To see current namespace
+
+kubectl run dev1 --image nginx
+kubectl run dev2 --image nginx
+kubectl run dev3 --image nginx
+
+kubectl create ns test			:  To create namespace   
+
+kubectl config set-context --current --namespace=test	:  To switch to the namespace
+
+kubectl config view | grep namespace	:  To see current namespace
+
+kubectl get po -n dev			:  To get the pods of the dev workspace
+
+kubectl delete pod dev1 -n dev		:  To delete the pod in dev workspace
+
+kubectl delete ns dev			:  To delete the workspace
+
+
+DAEMONSET:
+----------
+--> Used to create one pod on each workernode.
+--> It is the old version of the Deployment.
+--> If we create a new node a pod will be automatically created.
+--> If we delete a old node a pod will be automatically removed.
+
+--> Daemon sets will not be removed at any case in real time.
+Usecases  :  We can create pods for Logging, Monitoring of nodes.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: 
+  name: swiggy-deploy
+  labels:
+    app: swiggy
+spec:
+  selector:
+    matchLabels:
+      app: swiggy
+  template:
+    metadata:
+      labels:
+         app: swiggy
+    spec:
+      containers:
+        - image: saibootla/moviesrepo:latest
+          name: cont1
+          ports:
+            - containerPort: 80
+
+
+
+DAY-05 06/06/2024:
+------------------
+
+
+SERVICE  :  It is used to expose the application in K8S.
+
+TYPES:
+------
+1. CLUSTERIP:
+-------------
+--> It will work inside of the cluster.
+--> It will not expose to the outer world.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-deploy
+  labels:
+    app: movies
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      labels:
+        app: movies
+  template:
+    metadata:
+      labels:
+        app: movies
+    spec:
+       containers:
+         name: cont1
+        - image: saibootla/moviesrepo:latest
+         ports:
+           - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1
+spec:
+  type: ClusterIP
+  selector:
+    app: movies
+  ports:
+    - port: 80
+
+DRAWBACK : We cannot use the application outside.
+
+kubectl get svc
+
+
+
+2. NODEPORT:
+------------
+--> It will export our application in a particular port.
+--> Range : 30000 - 32767 (In security group we need to give all traffic)
+--> If we don't specify k8s service will take random port number.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-deploy
+  labels:
+    app: movies
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      labels:
+        app: movies
+  template:
+    metadata:
+      labels:
+        app: movies
+    spec:
+       containers:
+         name: cont1
+        - image: saibootla/moviesrepo:latest
+         ports:
+           - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1
+spec:
+  type: NodePort
+  selector:
+    app: movies
+  ports:
+    - port: 80
+      nodePort: 31111
+
+kubectl create -f app.yml
+kubectl apply -f app.yml
+
+NOTE : When you modify anything in the manifest file run the apply command.
+
+NOTE : In the worker nodes update the security group (Remove old traffic and give all traffic).
+
+DRAWBACK : --> Exposing the public IP and Port number
+           --> Port restriction
+
+
+3. LOAD BALANCER:
+-----------------
+--> It will expose our application and distribute the load b/w the pods.
+--> It will expose the application with DNS (Domain Name System) --> Port no. : 53
+--> To create DNS we use Route53
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-deploy
+  labels:
+    app: movies
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      labels:
+        app: movies
+  template:
+    metadata:
+      labels:
+        app: movies
+    spec:
+       containers:
+         name: cont1
+        - image: saibootla/moviesrepo:latest
+         ports:
+           - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1
+spec:
+  type: LoadBalancer
+  selector:
+    app: movies
+  ports:
+    - port: 80
+      targetPort: 80
+
+
+METRIC SERVER:
+--------------
+--> If we install metric server in k8s cluster it can collects metrics like CPU, RAM from all the pods and nodes in the cluster.
+--> We can use kubectl top pods/nodes to see the metrics.
+--> Previously we called it as heapster
+
+Metrics Server Offers:
+
+--> A single deployment that works on most clusters (See requirements).
+--> Fast autoscaling, collecting metrics for every 15secs.
+--> Resource efficiency, using 1 milli core of cpu and 2 mb of memory for each node in a cluster.
+--> Scalable support upto 5,000 node clusters.
+
+
+
+DAY-06 07/06/2024:
+------------------
+
+
+METRIC SERVER:
+--------------
+--> If we install metric server in k8s cluster it can collects metrics like cpu , mem ---
+--> From all the pods and nodes in cluster, we can use kubectl top po/no to see the metrics.
+
+Metrics Server Offers:
+
+--> A single deployment that works on most clusters (See requirements).
+--> Fast autoscaling, collecting metrics for every 15secs.
+--> Resource efficiency, using 1 milli core of cpu and 2 mb of memory for each node in a cluster.
+--> Scalable support upto 5,000 node clusters.
+
+You can use metric server for:
+
+--> CPU/Memory based horizontal autoscaling (Horizontal autoscaling).
+
+--> Automatically adjusting/suggesting resources needed by containers (Vertical autoscaling)
+
+Horizontal : new 
+Vertical   : Existing
+
+
+--> In Kubernetes, a HorizontalPodAutoscaler automatically updates a workload resource (such as Deployment or Replicaset), with the aim of 
+    automatically scaling the workload to match demand.
+
+Example :
+---------
+--> If you have pod1 with 50% load and pod2 with 50% then the average will be (50+50/2 = 50).
+--> But if pod-1 is exceeding 60% and pod-2 50% then average will be 55% (then here we need to create a pod-3 because it's exceeding the average).
+
+--> Here we need to use metric server whose work is to collect the metrics (cpu & mem info)
+--> Metric server is connected to the HPA and give info to HPA.
+--> Now HPA will analysis the metrics for every 30sec and create a new pod if needed.
+
+COOLING PERIOD:
+---------------
+--> In Kubernetes, a cooling period typically refers to the period of time allowed for graceful termination of a pod or workload before it is forcefully terminated or evicted from a node. 
+
+--> Scaling can be done only for scalable objects (ReplicaSet, Deployment, ReplicaSet Controller).
+--> HPA is implemented as a k8s API resources and a controller 
+--> Controller periodically adjust the number of replicas in RS, RC and Deployment depends on average.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:
+        app: movies
+    spec:
+      containers:
+         - image: saibootla/moviesrepo:latest
+           name: cont1
+
+kubectl create -f hpa.yml
+kubectl get all
+kubectl get deploy
+
+kubectl autoscale deployment movies --cpu-percent=50 --min=1 --max=10
+kubectl get hpa
+kubectl describe hpa movies
+kubectl get all
+
+--> Open second terminal and give kubectl get po --watch
+
+--> Come to first terminal and go inside pod 
+    kubectl exec -it pod_id - bin/bash
+
+apt update -y
+apt install stress -y
+stress
+
+--> Check terminal to see live pods
+
+
+
+DAY-07 08/06/2024:
+------------------
+
+
+QUOTAS:
+-------
+--> K8S cluster can be divided in to namespaces
+--> By default the pod in k8s will run with no limitations of memory and cpu.
+--> but we need to give limit for the pods.
+--> It can limit the objects that can be created in a namespace and total amount of resources.
+--> When we create a pod schedular will the limits of node to deploy pod on it.
+--> Here, we can set limits to CPU, Memory and Storage.
+
+--> Here, CPU is measured on cores and memoty in bytes
+--> 1CPU = 1000millicpus (half cpu = 500 millicpus or 0.5 cpu)
+
+--> Here request means how many we want 
+--> Limit means how many we can create maximum.
+
+--> limit can be given to the pods as well as nodes, the default limit is 0.
+
+--> If you mention request and limit then everything is fine.
+--> If you don't mention request and mention limit the Request=limit.
+--> If you mention request and not mention limit then Request=!limit.
+
+NOTE  :  --> Ever pod in namespace must have cpu limits.
+         --> The amount of CPU used by all the pods inside namespace must not exceed specified limit.
+
+DEFAULT RANGE:
+--------------
+CPU :
+MIN : Request = 0.5
+MAX : Limit = 1
+
+MEMORY :
+MIN : Request = 500m 
+MAX : Limit = 1Gi
+
+kubectl create ns dev
+kubectl config set-context --current --namespace=dev
+kubectl config view
+
+vim dev-quota.yml
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "5"
+    limits.cpu: "1"
+    limits.memory: 1Gi
+
+kubectl create -f dev-quota.yml
+kubectl get quota
+
+
+Ex. 1 : MENTIONING LIMITS : SAFE WAY
+------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:    
+        app: movies
+    spec:
+      containers:
+        name: cont1
+       - image: saibootla/moviesrepo:latest
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+
+kubectl create -f dev-quota.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:    
+        app: movies
+    spec:
+      containers:
+        name: cont1
+       - image: saibootla/moviesrepo:latest
+        resources:
+          limits:
+            cpu: "0.2"
+            memory: 100Mi
+
+kubectl create -f dev-quota.yml
+
+
+Ex. 2 : MENTIONING LIMITS & REQUESTS : SAFE WAY
+-----------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:    
+        app: movies
+    spec:
+      containers:
+        name: cont1
+       - image: saibootla/moviesrepo:latest
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: "0.2"
+            memory: 100Mi
+
+
+Ex. 3 : MENTION ONLY REQUESTS : NOT SAFE WAY
+--------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies
+  labels:
+    app: movies
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:    
+        app: movies
+    spec:
+      containers:
+        name: cont1
+       - image: saibootla/moviesrepo:latest
+        resources:
+          requests:
+            cpu: "0.2"
+            memory: 100Mi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
